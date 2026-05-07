@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>콘텐츠 배너 설정 — 안 2</title>
+<link href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css" rel="stylesheet">
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'Pretendard', sans-serif;
+    background: #EBEBEB;
+    min-height: 100vh;
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    padding: 72px 24px 48px;
+  }
+
+  /* Panel */
+  .panel {
+    width: 280px;
+    background: #fff;
+    border-radius: 12px;
+    border: 1px solid #E5E7EB;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.10);
+    overflow: hidden;
+  }
+  .panel-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 16px;
+    border-bottom: 1px solid #F3F4F6;
+  }
+  .panel-title { font-size: 14px; font-weight: 700; color: #111827; }
+  .close-btn {
+    width: 24px; height: 24px;
+    display: flex; align-items: center; justify-content: center;
+    color: #9CA3AF; font-size: 16px; cursor: pointer;
+    border: none; background: none; border-radius: 4px;
+  }
+  .close-btn:hover { background: #F3F4F6; }
+
+  .panel-body { padding: 16px; display: flex; flex-direction: column; gap: 20px; }
+
+  /* Section */
+  .section-label {
+    font-size: 12px; font-weight: 600; color: #374151;
+    display: flex; align-items: center; gap: 4px;
+    margin-bottom: 8px;
+  }
+  .info-icon {
+    width: 14px; height: 14px;
+    border-radius: 50%;
+    border: 1px solid #D1D5DB;
+    color: #9CA3AF;
+    font-size: 9px;
+    display: inline-flex; align-items: center; justify-content: center;
+    cursor: default;
+  }
+
+  /* Tabs */
+  .tabs {
+    display: flex;
+    border-bottom: 1px solid #F3F4F6;
+    margin-bottom: 12px;
+  }
+  .tab {
+    flex: 1;
+    text-align: center;
+    padding: 6px 0;
+    font-size: 12px;
+    font-weight: 500;
+    color: #9CA3AF;
+    cursor: pointer;
+    border-bottom: 2px solid transparent;
+    transition: all 0.15s;
+    user-select: none;
+  }
+  .tab.active {
+    color: #7C3AED;
+    border-bottom-color: #7C3AED;
+    font-weight: 600;
+  }
+  .tab .ai-dot { color: #7C3AED; }
+
+  /* Direct upload content */
+  .upload-area {
+    border: 1.5px dashed #D1D5DB;
+    border-radius: 8px;
+    height: 80px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    cursor: pointer;
+    transition: border-color 0.15s, background 0.15s;
+  }
+  .upload-area:hover { border-color: #7C3AED; background: #FAFAFF; }
+  .upload-area-text { font-size: 11px; color: #9CA3AF; }
+  .upload-area-sub { font-size: 10px; color: #D1D5DB; }
+
+  /* Banner grid */
+  .banner-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 6px;
+    margin-bottom: 10px;
+  }
+  .banner-card {
+    border-radius: 6px;
+    height: 64px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 11px;
+    font-weight: 600;
+    color: #fff;
+    cursor: pointer;
+    border: 2px solid transparent;
+    transition: border-color 0.15s, transform 0.1s;
+    user-select: none;
+  }
+  .banner-card:hover { transform: scale(1.02); }
+  .banner-card.selected { border-color: #7C3AED; box-shadow: 0 0 0 1px #7C3AED; }
+  .ba { background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%); }
+  .bb { background: linear-gradient(135deg, #0f3460 0%, #1a1a4e 100%); }
+  .bc { background: linear-gradient(135deg, #4a0000 0%, #7b0000 100%); }
+  .bd { background: linear-gradient(135deg, #e65c00 0%, #f9a825 100%); }
+
+  /* Buttons */
+  .btn-apply {
+    width: 100%;
+    height: 36px;
+    background: #7C3AED;
+    color: #fff;
+    font-size: 13px;
+    font-weight: 600;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-family: 'Pretendard', sans-serif;
+    margin-bottom: 6px;
+    transition: background 0.15s;
+  }
+  .btn-apply:hover { background: #6D28D9; }
+  .btn-more {
+    width: 100%;
+    height: 34px;
+    background: #fff;
+    color: #7C3AED;
+    font-size: 12px;
+    font-weight: 600;
+    border: 1.5px dashed #C4B5FD;
+    border-radius: 8px;
+    cursor: pointer;
+    font-family: 'Pretendard', sans-serif;
+    transition: background 0.15s;
+  }
+  .btn-more:hover { background: #F5F2FF; }
+
+  /* Empty state */
+  .empty-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    padding: 20px 0 12px;
+  }
+  .empty-icon { font-size: 20px; color: #D1D5DB; }
+  .empty-text { font-size: 12px; color: #9CA3AF; }
+  .btn-generate {
+    width: 100%;
+    height: 34px;
+    background: #fff;
+    color: #7C3AED;
+    font-size: 12px;
+    font-weight: 600;
+    border: 1.5px dashed #C4B5FD;
+    border-radius: 8px;
+    cursor: pointer;
+    font-family: 'Pretendard', sans-serif;
+    margin-top: 4px;
+    transition: background 0.15s;
+  }
+  .btn-generate:hover { background: #F5F2FF; }
+
+  /* Input */
+  .text-input {
+    width: 100%;
+    height: 36px;
+    border: 1px solid #E5E7EB;
+    border-radius: 8px;
+    padding: 0 10px;
+    font-size: 12px;
+    font-family: 'Pretendard', sans-serif;
+    color: #374151;
+    outline: none;
+    transition: border-color 0.15s;
+  }
+  .text-input::placeholder { color: #D1D5DB; }
+  .text-input:focus { border-color: #7C3AED; }
+
+  .panel-footer { padding: 0 16px 16px; }
+</style>
+</head>
+<body>
+
+  <div style="position:fixed;top:12px;left:50%;transform:translateX(-50%);z-index:9999;background:#1A1F2B;color:#fff;font-family:'Pretendard',sans-serif;font-size:12px;font-weight:500;padding:6px 14px;border-radius:100px;white-space:nowrap;pointer-events:none;">⚠️ 스타일 미확정 — 플로우·구조만 참고</div>
+
+  <div class="panel">
+    <div class="panel-header">
+      <span class="panel-title">콘텐츠 배너 설정</span>
+      <button class="close-btn">✕</button>
+    </div>
+
+    <div class="panel-body">
+
+      <!-- PC 이미지 -->
+      <div>
+        <div class="section-label">PC 이미지 <span class="info-icon">i</span></div>
+        <div class="tabs" id="pc-tabs">
+          <div class="tab" onclick="switchTab('pc', 'upload')">직접 업로드</div>
+          <div class="tab active" onclick="switchTab('pc', 'ai')"><span class="ai-dot">✦ </span>AI 배너</div>
+        </div>
+
+        <!-- PC: 직접 업로드 -->
+        <div id="pc-upload" style="display:none;">
+          <div class="upload-area">
+            <span class="upload-area-text">이미지를 드래그하거나 클릭해서 업로드</span>
+            <span class="upload-area-sub">PNG, JPG · 최대 10MB</span>
+          </div>
+        </div>
+
+        <!-- PC: AI 배너 -->
+        <div id="pc-ai">
+          <div class="banner-grid">
+            <div class="banner-card ba selected" onclick="selectBanner(this)">배너 A</div>
+            <div class="banner-card bb" onclick="selectBanner(this)">배너 B</div>
+            <div class="banner-card bc" onclick="selectBanner(this)">배너 C</div>
+            <div class="banner-card bd" onclick="selectBanner(this)">배너 D</div>
+          </div>
+          <button class="btn-apply">적용하기</button>
+          <button class="btn-more">✦ AI 배너 더 생성하기</button>
+        </div>
+      </div>
+
+      <!-- 모바일 이미지 -->
+      <div>
+        <div class="section-label">모바일 이미지 <span class="info-icon">i</span></div>
+        <div class="tabs" id="mo-tabs">
+          <div class="tab" onclick="switchTab('mo', 'upload')">직접 업로드</div>
+          <div class="tab active" onclick="switchTab('mo', 'ai')"><span class="ai-dot">✦ </span>AI 배너</div>
+        </div>
+
+        <!-- 모바일: 직접 업로드 -->
+        <div id="mo-upload" style="display:none;">
+          <div class="upload-area">
+            <span class="upload-area-text">이미지를 드래그하거나 클릭해서 업로드</span>
+            <span class="upload-area-sub">PNG, JPG · 최대 10MB</span>
+          </div>
+        </div>
+
+        <!-- 모바일: AI 배너 — 빈 상태 -->
+        <div id="mo-ai">
+          <div class="empty-state">
+            <span class="empty-icon">✦</span>
+            <span class="empty-text">아직 생성된 AI 배너가 없어요</span>
+          </div>
+          <button class="btn-generate">✦ AI 배너 생성하러 가기 →</button>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- 소재목 -->
+    <div class="panel-footer">
+      <div class="section-label" style="margin-bottom:6px;">소재목</div>
+      <input class="text-input" type="text" placeholder="소재목">
+    </div>
+  </div>
+
+<script>
+  function switchTab(section, type) {
+    const tabs = document.getElementById(section + '-tabs').querySelectorAll('.tab');
+    tabs[0].classList.toggle('active', type === 'upload');
+    tabs[1].classList.toggle('active', type === 'ai');
+    document.getElementById(section + '-upload').style.display = type === 'upload' ? 'block' : 'none';
+    document.getElementById(section + '-ai').style.display = type === 'ai' ? 'block' : 'none';
+  }
+
+  function selectBanner(el) {
+    document.querySelectorAll('.banner-card').forEach(c => c.classList.remove('selected'));
+    el.classList.add('selected');
+  }
+</script>
+
+</body>
+</html>
