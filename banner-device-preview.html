@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>콘텐츠 배너 설정 — 디바이스 미리보기</title>
+<link href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css" rel="stylesheet">
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'Pretendard', sans-serif;
+    background: #EBEBEB;
+    min-height: 100vh;
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    padding: 72px 24px 48px;
+  }
+
+  .panel {
+    width: 320px;
+    background: #fff;
+    border-radius: 12px;
+    border: 1px solid #E5E7EB;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.10);
+    overflow: hidden;
+  }
+  .panel-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 16px;
+    border-bottom: 1px solid #F3F4F6;
+  }
+  .panel-title { font-size: 14px; font-weight: 700; color: #111827; }
+  .close-btn {
+    width: 24px; height: 24px;
+    display: flex; align-items: center; justify-content: center;
+    color: #9CA3AF; font-size: 16px; cursor: pointer;
+    border: none; background: none; border-radius: 4px;
+  }
+  .close-btn:hover { background: #F3F4F6; }
+
+  .panel-body { padding: 16px; display: flex; flex-direction: column; gap: 24px; }
+
+  .section-label {
+    font-size: 12px; font-weight: 600; color: #374151;
+    display: flex; align-items: center; gap: 4px;
+    margin-bottom: 10px;
+  }
+  .required { color: #EF4444; font-size: 11px; font-weight: 500; }
+
+  /* Tabs */
+  .tabs {
+    display: flex;
+    border-bottom: 1px solid #F3F4F6;
+    margin-bottom: 12px;
+  }
+  .tab {
+    flex: 1; text-align: center;
+    padding: 6px 0;
+    font-size: 12px; font-weight: 500;
+    color: #9CA3AF; cursor: pointer;
+    border-bottom: 2px solid transparent;
+    transition: all 0.15s;
+    user-select: none;
+  }
+  .tab.active { color: #7C3AED; border-bottom-color: #7C3AED; font-weight: 600; }
+
+  /* PC Browser Mockup */
+  .browser-wrap {
+    margin-bottom: 12px;
+    border: 1.5px solid #E5E7EB;
+    border-radius: 8px;
+    overflow: hidden;
+    background: #fff;
+  }
+  .browser-bar {
+    background: #F9FAFB;
+    padding: 5px 8px;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    border-bottom: 1px solid #E5E7EB;
+  }
+  .dot { width: 6px; height: 6px; border-radius: 50%; }
+  .dot-r { background: #FCA5A5; }
+  .dot-y { background: #FCD34D; }
+  .dot-g { background: #6EE7B7; }
+  .url-bar {
+    flex: 1; height: 12px;
+    background: #E5E7EB; border-radius: 3px; margin-left: 4px;
+  }
+  .browser-banner {
+    width: 100%; height: 52px;
+    display: block;
+    transition: background 0.2s;
+  }
+  .browser-body {
+    padding: 8px;
+    display: flex; flex-direction: column; gap: 5px;
+    background: #F9FAFB;
+  }
+  .sk { height: 6px; background: #E5E7EB; border-radius: 3px; }
+  .sk.s { width: 55%; }
+  .sk-row { display: flex; gap: 4px; }
+  .sk-card { flex: 1; height: 28px; background: #E5E7EB; border-radius: 4px; }
+
+  /* Mobile Phone Mockup */
+  .phone-wrap {
+    margin-bottom: 12px;
+    display: flex;
+    justify-content: center;
+  }
+  .phone {
+    width: 110px;
+    border: 2px solid #D1D5DB;
+    border-radius: 18px;
+    overflow: hidden;
+    background: #fff;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+  }
+  .phone-top {
+    background: #F9FAFB;
+    padding: 6px 0 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-bottom: 1px solid #F3F4F6;
+  }
+  .phone-notch {
+    width: 28px; height: 4px;
+    background: #D1D5DB; border-radius: 2px;
+  }
+  .phone-banner {
+    width: 100%; height: 62px;
+    display: block;
+    transition: background 0.2s;
+  }
+  .phone-body {
+    padding: 6px;
+    display: flex; flex-direction: column; gap: 4px;
+    background: #F9FAFB;
+  }
+  .psk { height: 5px; background: #E5E7EB; border-radius: 2px; }
+  .psk.s { width: 50%; }
+  .psk-row { display: flex; gap: 3px; margin-top: 2px; }
+  .psk-card { flex: 1; height: 22px; background: #E5E7EB; border-radius: 3px; }
+
+  /* Banner grid */
+  .banner-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 6px;
+    margin-bottom: 10px;
+  }
+  .banner-card {
+    border-radius: 6px; height: 60px;
+    cursor: pointer;
+    border: 2px solid transparent;
+    transition: border-color 0.15s, transform 0.1s;
+    user-select: none;
+    position: relative;
+  }
+  .banner-card:hover { transform: scale(1.02); }
+  .banner-card.selected { border-color: #7C3AED; box-shadow: 0 0 0 1px #7C3AED; }
+  .banner-card.selected::after {
+    content: '✓';
+    position: absolute; top: 4px; right: 4px;
+    width: 16px; height: 16px;
+    background: #7C3AED; color: #fff;
+    border-radius: 50%; font-size: 9px;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .b1 { background: linear-gradient(135deg, #a8edea, #fed6e3); }
+  .b2 { background: linear-gradient(135deg, #c3aed6, #f9e4b7); }
+  .b3 { background: linear-gradient(135deg, #89f7fe, #66a6ff); }
+  .b4 { background: linear-gradient(135deg, #fddb92, #d1fdff); }
+
+  /* Buttons */
+  .btn-apply {
+    width: 100%; height: 36px;
+    background: #7C3AED; color: #fff;
+    font-size: 13px; font-weight: 600;
+    border: none; border-radius: 8px; cursor: pointer;
+    font-family: 'Pretendard', sans-serif;
+    margin-bottom: 6px;
+    transition: background 0.15s;
+  }
+  .btn-apply:hover { background: #6D28D9; }
+  .btn-more {
+    width: 100%; height: 34px;
+    background: #fff; color: #7C3AED;
+    font-size: 12px; font-weight: 600;
+    border: 1.5px dashed #C4B5FD; border-radius: 8px;
+    cursor: pointer; font-family: 'Pretendard', sans-serif;
+    transition: background 0.15s;
+  }
+  .btn-more:hover { background: #F5F2FF; }
+
+  /* Upload */
+  .upload-area {
+    border: 1.5px dashed #D1D5DB; border-radius: 8px;
+    height: 72px;
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center; gap: 4px;
+    cursor: pointer; transition: border-color 0.15s, background 0.15s;
+    margin-bottom: 10px;
+  }
+  .upload-area:hover { border-color: #7C3AED; background: #FAFAFF; }
+  .upload-text { font-size: 11px; color: #9CA3AF; }
+
+  .panel-footer { padding: 0 16px 16px; }
+  .footer-label { font-size: 12px; font-weight: 600; color: #374151; margin-bottom: 6px; }
+  .text-input {
+    width: 100%; height: 36px;
+    border: 1px solid #E5E7EB; border-radius: 8px;
+    padding: 0 10px; font-size: 12px;
+    font-family: 'Pretendard', sans-serif; color: #374151; outline: none;
+  }
+  .text-input:focus { border-color: #7C3AED; }
+
+  .divider { height: 1px; background: #F3F4F6; margin: 0 -16px; }
+</style>
+</head>
+<body>
+
+<div style="position:fixed;top:12px;left:50%;transform:translateX(-50%);z-index:9999;background:#1A1F2B;color:#fff;font-family:'Pretendard',sans-serif;font-size:12px;font-weight:500;padding:6px 14px;border-radius:100px;white-space:nowrap;pointer-events:none;">⚠️ 스타일 미확정 — 플로우·구조만 참고</div>
+
+<div class="panel">
+  <div class="panel-header">
+    <span class="panel-title">콘텐츠 배너 설정</span>
+    <button class="close-btn">✕</button>
+  </div>
+
+  <div class="panel-body">
+
+    <!-- PC 이미지 -->
+    <div>
+      <div class="section-label">PC 이미지 <span class="required">*필수</span></div>
+      <div class="tabs" id="pc-tabs">
+        <div class="tab" onclick="switchTab('pc','upload')">직접 업로드</div>
+        <div class="tab active" onclick="switchTab('pc','ai')">✦ AI 배너</div>
+      </div>
+
+      <div id="pc-upload" style="display:none;">
+        <div class="upload-area">
+          <span class="upload-text">이미지를 드래그하거나 클릭해서 업로드</span>
+          <span class="upload-text" style="color:#D1D5DB;font-size:10px;">PNG, JPG · 최대 10MB</span>
+        </div>
+      </div>
+
+      <div id="pc-ai">
+        <div class="browser-wrap">
+          <div class="browser-bar">
+            <div class="dot dot-r"></div>
+            <div class="dot dot-y"></div>
+            <div class="dot dot-g"></div>
+            <div class="url-bar"></div>
+          </div>
+          <div id="pc-preview" class="browser-banner b1"></div>
+          <div class="browser-body">
+            <div class="sk"></div>
+            <div class="sk s"></div>
+            <div class="sk-row">
+              <div class="sk-card"></div>
+              <div class="sk-card"></div>
+              <div class="sk-card"></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="banner-grid" id="pc-grid">
+          <div class="banner-card b1 selected" onclick="selectBanner('pc',this,'b1')"></div>
+          <div class="banner-card b2" onclick="selectBanner('pc',this,'b2')"></div>
+          <div class="banner-card b3" onclick="selectBanner('pc',this,'b3')"></div>
+          <div class="banner-card b4" onclick="selectBanner('pc',this,'b4')"></div>
+        </div>
+        <button class="btn-apply">적용하기</button>
+        <button class="btn-more">✦ AI 배너 더 생성하기</button>
+      </div>
+    </div>
+
+    <div class="divider"></div>
+
+    <!-- 모바일 이미지 -->
+    <div>
+      <div class="section-label">모바일 이미지</div>
+      <div class="tabs" id="mo-tabs">
+        <div class="tab" onclick="switchTab('mo','upload')">직접 업로드</div>
+        <div class="tab active" onclick="switchTab('mo','ai')">✦ AI 배너</div>
+      </div>
+
+      <div id="mo-upload" style="display:none;">
+        <div class="upload-area">
+          <span class="upload-text">이미지를 드래그하거나 클릭해서 업로드</span>
+          <span class="upload-text" style="color:#D1D5DB;font-size:10px;">PNG, JPG · 최대 10MB</span>
+        </div>
+      </div>
+
+      <div id="mo-ai">
+        <div class="phone-wrap">
+          <div class="phone">
+            <div class="phone-top">
+              <div class="phone-notch"></div>
+            </div>
+            <div id="mo-preview" class="phone-banner b1"></div>
+            <div class="phone-body">
+              <div class="psk"></div>
+              <div class="psk s"></div>
+              <div class="psk-row">
+                <div class="psk-card"></div>
+                <div class="psk-card"></div>
+              </div>
+              <div class="psk-row">
+                <div class="psk-card"></div>
+                <div class="psk-card"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="banner-grid" id="mo-grid">
+          <div class="banner-card b1 selected" onclick="selectBanner('mo',this,'b1')"></div>
+          <div class="banner-card b2" onclick="selectBanner('mo',this,'b2')"></div>
+          <div class="banner-card b3" onclick="selectBanner('mo',this,'b3')"></div>
+          <div class="banner-card b4" onclick="selectBanner('mo',this,'b4')"></div>
+        </div>
+        <button class="btn-apply">적용하기</button>
+        <button class="btn-more">✦ AI 배너 더 생성하기</button>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="panel-footer">
+    <div class="footer-label">소재목</div>
+    <input class="text-input" type="text" placeholder="소재목">
+  </div>
+</div>
+
+<script>
+  function switchTab(section, type) {
+    const tabs = document.getElementById(section + '-tabs').querySelectorAll('.tab');
+    tabs[0].classList.toggle('active', type === 'upload');
+    tabs[1].classList.toggle('active', type === 'ai');
+    document.getElementById(section + '-upload').style.display = type === 'upload' ? 'block' : 'none';
+    document.getElementById(section + '-ai').style.display = type === 'ai' ? 'block' : 'none';
+  }
+
+  function selectBanner(section, el, colorClass) {
+    const grid = document.getElementById(section + '-grid');
+    grid.querySelectorAll('.banner-card').forEach(c => c.classList.remove('selected'));
+    el.classList.add('selected');
+
+    const preview = document.getElementById(section + '-preview');
+    preview.className = (section === 'pc' ? 'browser-banner' : 'phone-banner') + ' ' + colorClass;
+  }
+</script>
+
+</body>
+</html>
