@@ -15,54 +15,9 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 24px;
+    gap: 16px;
   }
 
-  /* State switcher */
-  .state-bar {
-    display: flex;
-    gap: 8px;
-    background: #fff;
-    border: 1px solid #E5E7EB;
-    border-radius: 12px;
-    padding: 6px;
-  }
-  .state-btn {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    padding: 8px 16px;
-    border-radius: 8px;
-    border: none;
-    background: transparent;
-    cursor: pointer;
-    font-family: 'Pretendard', sans-serif;
-    font-size: 13px;
-    font-weight: 500;
-    color: #9CA3AF;
-    transition: all 0.15s;
-  }
-  .state-btn.active {
-    background: #7C3AED;
-    color: #fff;
-  }
-  .state-btn .num {
-    width: 20px;
-    height: 20px;
-    border-radius: 50%;
-    background: rgba(255,255,255,0.25);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 11px;
-    font-weight: 700;
-  }
-  .state-btn:not(.active) .num {
-    background: #F3F4F6;
-    color: #6B7280;
-  }
-
-  /* Panel */
   .panel {
     width: 340px;
     background: #fff;
@@ -71,7 +26,6 @@
     overflow: hidden;
     box-shadow: 0 4px 16px rgba(0,0,0,0.08);
   }
-
   .panel-header {
     padding: 16px 16px 10px;
     border-bottom: 1px solid #F3F4F6;
@@ -82,11 +36,7 @@
     align-items: center;
     margin-bottom: 4px;
   }
-  .panel-title {
-    font-size: 15px;
-    font-weight: 700;
-    color: #111827;
-  }
+  .panel-title { font-size: 15px; font-weight: 700; color: #111827; }
   .refresh-btn {
     display: flex;
     align-items: center;
@@ -100,11 +50,7 @@
     cursor: pointer;
     font-family: 'Pretendard', sans-serif;
   }
-  .panel-sub {
-    font-size: 11px;
-    color: #9CA3AF;
-    line-height: 1.4;
-  }
+  .panel-sub { font-size: 11px; color: #9CA3AF; line-height: 1.4; }
   .panel-body {
     padding: 12px;
     display: flex;
@@ -112,8 +58,8 @@
     gap: 8px;
   }
 
-  /* Upload — default (State 1) */
-  .upload-full {
+  /* Upload — idle */
+  .upload-idle {
     width: 100%;
     height: 56px;
     border: 1.5px dashed #A78BFA;
@@ -124,78 +70,52 @@
     justify-content: center;
     gap: 8px;
     cursor: pointer;
+    transition: background 0.15s, border-color 0.15s;
   }
-  .upload-full-icon {
-    width: 24px;
-    height: 24px;
+  .upload-idle:hover { background: #F3F0FF; border-color: #7C3AED; }
+  .upload-idle-icon {
+    width: 24px; height: 24px;
     background: #EDE9FE;
     border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 14px;
-    color: #6D28D9;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 14px; color: #6D28D9;
   }
-  .upload-full-text {
-    font-size: 12px;
-    font-weight: 600;
-    color: #6D28D9;
-  }
-  .upload-full-sub {
-    font-size: 11px;
-    color: #9CA3AF;
-  }
+  .upload-idle-text { font-size: 12px; font-weight: 600; color: #6D28D9; }
+  .upload-idle-sub { font-size: 11px; color: #9CA3AF; }
 
-  /* Upload — completed (State 2) */
+  /* Upload — done */
   .upload-done {
     width: 100%;
     height: 56px;
     border: 1.5px solid #7C3AED;
     border-radius: 8px;
     background: #F5F2FF;
-    display: flex;
+    display: none;
     align-items: center;
     padding: 0 12px;
     gap: 10px;
   }
   .upload-thumb {
-    width: 36px;
-    height: 36px;
+    width: 36px; height: 36px;
     border-radius: 6px;
     background: linear-gradient(135deg, #C8A882 0%, #A07850 100%);
     flex-shrink: 0;
-    position: relative;
-    overflow: hidden;
+    position: relative; overflow: hidden;
   }
   .upload-thumb::after {
     content: '';
     position: absolute;
-    bottom: 4px;
-    left: 50%;
+    bottom: 4px; left: 50%;
     transform: translateX(-50%);
-    width: 14px;
-    height: 18px;
+    width: 14px; height: 18px;
     background: rgba(255,255,255,0.4);
     border-radius: 2px;
   }
-  .upload-done-info {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    gap: 1px;
-  }
-  .upload-done-name {
-    font-size: 12px;
-    font-weight: 600;
-    color: #6D28D9;
-  }
-  .upload-done-sub {
-    font-size: 10px;
-    color: #9CA3AF;
-  }
+  .upload-done-info { flex: 1; display: flex; flex-direction: column; gap: 1px; }
+  .upload-done-name { font-size: 12px; font-weight: 600; color: #6D28D9; }
+  .upload-done-sub { font-size: 10px; color: #9CA3AF; }
   .upload-change-btn {
-    font-size: 11px;
-    font-weight: 500;
+    font-size: 11px; font-weight: 500;
     color: #6B7280;
     background: #fff;
     border: 1px solid #E5E7EB;
@@ -208,24 +128,14 @@
 
   /* Divider */
   .divider-label {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    padding: 0 4px;
+    display: flex; align-items: center; gap: 8px; padding: 0 4px;
   }
   .divider-label::before, .divider-label::after {
-    content: '';
-    flex: 1;
-    height: 1px;
-    background: #F3F4F6;
+    content: ''; flex: 1; height: 1px; background: #F3F4F6;
   }
-  .divider-label span {
-    font-size: 10px;
-    color: #D1D5DB;
-    white-space: nowrap;
-  }
+  .divider-label span { font-size: 10px; color: #D1D5DB; white-space: nowrap; }
 
-  /* Style grid */
+  /* Grid */
   .style-grid {
     display: grid;
     grid-template-columns: 1fr 1fr;
@@ -245,14 +155,45 @@
   .style-card::after {
     content: '';
     position: absolute;
-    bottom: 8px;
-    left: 50%;
+    bottom: 8px; left: 50%;
     transform: translateX(-50%);
-    width: 40px;
-    height: 48px;
+    width: 40px; height: 48px;
     background: rgba(255,255,255,0.35);
     border-radius: 4px;
   }
+
+  /* Uploaded image card (first slot) */
+  .uploaded-card {
+    aspect-ratio: 4/3;
+    border-radius: 6px;
+    overflow: hidden;
+    cursor: pointer;
+    position: relative;
+    border: 2px solid #7C3AED;
+    background: linear-gradient(135deg, #C8A882 0%, #A07850 100%);
+    display: none;
+  }
+  .uploaded-card::after {
+    content: '';
+    position: absolute;
+    bottom: 8px; left: 50%;
+    transform: translateX(-50%);
+    width: 40px; height: 48px;
+    background: rgba(255,255,255,0.4);
+    border-radius: 4px;
+  }
+  .uploaded-card .card-label {
+    position: absolute;
+    top: 6px; left: 6px;
+    background: rgba(124,58,237,0.85);
+    color: #fff;
+    font-size: 9px;
+    font-weight: 700;
+    padding: 2px 6px;
+    border-radius: 4px;
+    z-index: 1;
+  }
+
   .g1 { background: linear-gradient(135deg, #E8E0D8 0%, #C5B9AF 100%); }
   .g2 { background: linear-gradient(135deg, #D4C5BC 0%, #B8A89E 100%); }
   .g3 { background: linear-gradient(135deg, #EDE8E3 0%, #D4C8C0 100%); }
@@ -260,68 +201,37 @@
   .g5 { background: linear-gradient(135deg, #E0D8D0 0%, #C4B8B0 100%); }
   .g6 { background: linear-gradient(135deg, #D8CEC8 0%, #BEB0A8 100%); }
 
-  /* Panel footer */
-  .panel-footer {
-    padding: 10px 12px 12px;
-    display: flex;
-    gap: 8px;
-  }
+  /* Footer */
+  .panel-footer { padding: 10px 12px 12px; display: flex; gap: 8px; }
   .btn-cancel {
-    flex: 1;
-    height: 36px;
+    flex: 1; height: 36px;
     border-radius: 8px;
     border: 1px solid #E5E7EB;
     background: #fff;
-    font-size: 13px;
-    font-weight: 500;
-    color: #6B7280;
-    cursor: pointer;
-    font-family: 'Pretendard', sans-serif;
+    font-size: 13px; font-weight: 500; color: #6B7280;
+    cursor: pointer; font-family: 'Pretendard', sans-serif;
   }
   .btn-select {
-    flex: 1;
-    height: 36px;
-    border-radius: 8px;
-    border: none;
-    font-size: 13px;
-    font-weight: 600;
-    color: #fff;
-    cursor: pointer;
+    flex: 1; height: 36px;
+    border-radius: 8px; border: none;
+    font-size: 13px; font-weight: 600; color: #fff;
     font-family: 'Pretendard', sans-serif;
-    transition: background 0.15s, opacity 0.15s;
+    transition: background 0.15s;
   }
-  .btn-select.active { background: #7C3AED; }
-  .btn-select.inactive { background: #D1D5DB; cursor: default; }
+  .btn-select.on { background: #7C3AED; cursor: pointer; }
+  .btn-select.off { background: #D1D5DB; cursor: default; }
 
-  /* State desc */
-  .state-desc {
-    font-size: 12px;
-    color: #6B7280;
-    text-align: center;
-    line-height: 1.6;
-    max-width: 340px;
+  /* Hint */
+  .hint {
+    font-size: 11px; color: #9CA3AF;
+    text-align: center; line-height: 1.6;
   }
-  .state-desc strong { color: #374151; }
 </style>
 </head>
 <body>
 
   <div style="position:fixed;top:12px;left:50%;transform:translateX(-50%);z-index:9999;background:#1A1F2B;color:#fff;font-family:'Pretendard',sans-serif;font-size:12px;font-weight:500;padding:6px 14px;border-radius:100px;white-space:nowrap;pointer-events:none;">⚠️ 스타일 미확정 — 플로우·구조만 참고</div>
 
-  <!-- State switcher -->
-  <div class="state-bar">
-    <button class="state-btn active" onclick="setState(1)">
-      <span class="num">1</span> 초기
-    </button>
-    <button class="state-btn" onclick="setState(2)">
-      <span class="num">2</span> 업로드 완료
-    </button>
-    <button class="state-btn" onclick="setState(3)">
-      <span class="num">3</span> 추천 선택
-    </button>
-  </div>
-
-  <!-- Panel -->
   <div class="panel">
     <div class="panel-header">
       <div class="panel-title-row">
@@ -332,78 +242,71 @@
     </div>
     <div class="panel-body">
 
-      <!-- State 1: 기본 업로드 영역 -->
-      <div id="upload-default" class="upload-full">
-        <div class="upload-full-icon">↑</div>
-        <span class="upload-full-text">내 이미지로 스타일 지정하기</span>
-        <span class="upload-full-sub">클릭 또는 드래그</span>
+      <!-- Upload idle -->
+      <div class="upload-idle" id="upload-idle" onclick="doUpload()">
+        <div class="upload-idle-icon">↑</div>
+        <span class="upload-idle-text">내 이미지로 스타일 지정하기</span>
+        <span class="upload-idle-sub">클릭 또는 드래그</span>
       </div>
 
-      <!-- State 2: 업로드 완료 -->
-      <div id="upload-done" class="upload-done" style="display:none;">
+      <!-- Upload done -->
+      <div class="upload-done" id="upload-done">
         <div class="upload-thumb"></div>
         <div class="upload-done-info">
           <span class="upload-done-name">내 이미지 · 선택됨</span>
           <span class="upload-done-sub">스타일 레퍼런스로 사용</span>
         </div>
-        <button class="upload-change-btn">변경</button>
+        <button class="upload-change-btn" onclick="resetUpload()">변경</button>
       </div>
 
       <div class="divider-label"><span>또는 추천 스타일 선택</span></div>
 
-      <div class="style-grid">
-        <div class="style-card g1" id="card1"></div>
-        <div class="style-card g2" id="card2"></div>
-        <div class="style-card g3" id="card3"></div>
-        <div class="style-card g4" id="card4"></div>
-        <div class="style-card g5" id="card5"></div>
-        <div class="style-card g6" id="card6"></div>
+      <div class="style-grid" id="grid">
+        <!-- 업로드 후 첫번째 슬롯에 삽입됨 -->
+        <div class="uploaded-card" id="uploaded-card" onclick="selectCard(this)">
+          <span class="card-label">내 이미지</span>
+        </div>
+        <div class="style-card g1" onclick="selectCard(this)"></div>
+        <div class="style-card g2" onclick="selectCard(this)"></div>
+        <div class="style-card g3" onclick="selectCard(this)"></div>
+        <div class="style-card g4" onclick="selectCard(this)"></div>
+        <div class="style-card g5" onclick="selectCard(this)"></div>
+        <div class="style-card g6" onclick="selectCard(this)"></div>
       </div>
     </div>
     <div class="panel-footer">
       <button class="btn-cancel">취소</button>
-      <button class="btn-select inactive" id="btn-select">선택</button>
+      <button class="btn-select off" id="btn-select">선택</button>
     </div>
   </div>
 
-  <!-- State description -->
-  <p class="state-desc" id="state-desc">
-    아무것도 선택되지 않은 초기 상태.<br>업로드하거나 추천 스타일을 골라야 <strong>선택 버튼 활성화</strong>
-  </p>
+  <p class="hint" id="hint">업로드 영역을 클릭해보세요</p>
 
 <script>
-  function setState(n) {
-    // Buttons
-    document.querySelectorAll('.state-btn').forEach((b, i) => {
-      b.classList.toggle('active', i + 1 === n);
-    });
+  function doUpload() {
+    document.getElementById('upload-idle').style.display = 'none';
+    document.getElementById('upload-done').style.display = 'flex';
+    const card = document.getElementById('uploaded-card');
+    card.style.display = 'block';
+    selectCard(card);
+    document.getElementById('hint').textContent = '추천 스타일을 클릭하면 전환돼요';
+  }
 
-    const uploadDefault = document.getElementById('upload-default');
-    const uploadDone = document.getElementById('upload-done');
-    const btnSelect = document.getElementById('btn-select');
-    const desc = document.getElementById('state-desc');
-    const cards = document.querySelectorAll('.style-card');
+  function resetUpload() {
+    document.getElementById('upload-idle').style.display = 'flex';
+    document.getElementById('upload-done').style.display = 'none';
+    const card = document.getElementById('uploaded-card');
+    card.style.display = 'none';
+    card.classList.remove('selected');
+    document.querySelectorAll('.style-card').forEach(c => c.classList.remove('selected'));
+    document.getElementById('btn-select').className = 'btn-select off';
+    document.getElementById('hint').textContent = '업로드 영역을 클릭해보세요';
+  }
 
-    // Reset all cards
-    cards.forEach(c => c.classList.remove('selected'));
-
-    if (n === 1) {
-      uploadDefault.style.display = 'flex';
-      uploadDone.style.display = 'none';
-      btnSelect.className = 'btn-select inactive';
-      desc.innerHTML = '아무것도 선택되지 않은 초기 상태.<br>업로드하거나 추천 스타일을 골라야 <strong>선택 버튼 활성화</strong>';
-    } else if (n === 2) {
-      uploadDefault.style.display = 'none';
-      uploadDone.style.display = 'flex';
-      btnSelect.className = 'btn-select active';
-      desc.innerHTML = '업로드 완료 → 내 이미지 <strong>자동 선택(default)</strong>.<br>추천 스타일 클릭 시 내 이미지 선택 해제.';
-    } else if (n === 3) {
-      uploadDefault.style.display = 'flex';
-      uploadDone.style.display = 'none';
-      document.getElementById('card1').classList.add('selected');
-      btnSelect.className = 'btn-select active';
-      desc.innerHTML = '추천 스타일 선택 시 해당 카드 활성화.<br>업로드 영역은 유지 — <strong>언제든 내 이미지로 전환 가능</strong>.';
-    }
+  function selectCard(el) {
+    document.querySelectorAll('.style-card, .uploaded-card').forEach(c => c.classList.remove('selected'));
+    el.classList.add('selected');
+    document.getElementById('btn-select').className = 'btn-select on';
   }
 </script>
 
