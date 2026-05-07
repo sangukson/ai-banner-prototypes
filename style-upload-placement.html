@@ -3,44 +3,64 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>스타일 업로드 버튼 위치 비교</title>
+<title>스타일 선택 — Option A 플로우</title>
 <link href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css" rel="stylesheet">
 <style>
   * { box-sizing: border-box; margin: 0; padding: 0; }
   body {
     font-family: 'Pretendard', sans-serif;
     background: #F5F5F5;
-    display: flex;
-    gap: 40px;
-    padding: 40px;
-    justify-content: center;
-    align-items: flex-start;
     min-height: 100vh;
-  }
-
-  .column {
+    padding: 60px 24px 40px;
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 12px;
+    gap: 24px;
   }
 
-  .label {
+  /* State switcher */
+  .state-bar {
+    display: flex;
+    gap: 8px;
+    background: #fff;
+    border: 1px solid #E5E7EB;
+    border-radius: 12px;
+    padding: 6px;
+  }
+  .state-btn {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 16px;
+    border-radius: 8px;
+    border: none;
+    background: transparent;
+    cursor: pointer;
+    font-family: 'Pretendard', sans-serif;
     font-size: 13px;
-    font-weight: 600;
-    color: #6B7280;
-    letter-spacing: 0.02em;
+    font-weight: 500;
+    color: #9CA3AF;
+    transition: all 0.15s;
   }
-
-  .badge {
+  .state-btn.active {
+    background: #7C3AED;
+    color: #fff;
+  }
+  .state-btn .num {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.25);
+    display: flex;
+    align-items: center;
+    justify-content: center;
     font-size: 11px;
     font-weight: 700;
-    padding: 2px 8px;
-    border-radius: 20px;
-    letter-spacing: 0.01em;
   }
-  .badge.recommended { background: #EDE9FE; color: #6D28D9; }
-  .badge.alt { background: #F3F4F6; color: #6B7280; }
+  .state-btn:not(.active) .num {
+    background: #F3F4F6;
+    color: #6B7280;
+  }
 
   /* Panel */
   .panel {
@@ -56,20 +76,17 @@
     padding: 16px 16px 10px;
     border-bottom: 1px solid #F3F4F6;
   }
-
   .panel-title-row {
     display: flex;
     justify-content: space-between;
     align-items: center;
     margin-bottom: 4px;
   }
-
   .panel-title {
     font-size: 15px;
     font-weight: 700;
     color: #111827;
   }
-
   .refresh-btn {
     display: flex;
     align-items: center;
@@ -81,14 +98,13 @@
     border-radius: 6px;
     padding: 4px 10px;
     cursor: pointer;
+    font-family: 'Pretendard', sans-serif;
   }
-
   .panel-sub {
     font-size: 11px;
     color: #9CA3AF;
     line-height: 1.4;
   }
-
   .panel-body {
     padding: 12px;
     display: flex;
@@ -96,7 +112,7 @@
     gap: 8px;
   }
 
-  /* Upload area — full width */
+  /* Upload — default (State 1) */
   .upload-full {
     width: 100%;
     height: 56px;
@@ -108,11 +124,6 @@
     justify-content: center;
     gap: 8px;
     cursor: pointer;
-    transition: background 0.15s, border-color 0.15s;
-  }
-  .upload-full:hover {
-    background: #F3F0FF;
-    border-color: #7C3AED;
   }
   .upload-full-icon {
     width: 24px;
@@ -135,108 +146,67 @@
     color: #9CA3AF;
   }
 
-  /* Style grid */
-  .style-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 6px;
+  /* Upload — completed (State 2) */
+  .upload-done {
+    width: 100%;
+    height: 56px;
+    border: 1.5px solid #7C3AED;
+    border-radius: 8px;
+    background: #F5F2FF;
+    display: flex;
+    align-items: center;
+    padding: 0 12px;
+    gap: 10px;
   }
-
-  .style-card {
-    aspect-ratio: 4/3;
+  .upload-thumb {
+    width: 36px;
+    height: 36px;
     border-radius: 6px;
-    overflow: hidden;
-    cursor: pointer;
+    background: linear-gradient(135deg, #C8A882 0%, #A07850 100%);
+    flex-shrink: 0;
     position: relative;
-    border: 2px solid transparent;
-    transition: border-color 0.15s;
+    overflow: hidden;
   }
-  .style-card:hover { border-color: #C4B5FD; }
-  .style-card.selected { border-color: #7C3AED; }
-
-  /* Gradient placeholders mimicking product photos */
-  .g1 { background: linear-gradient(135deg, #E8E0D8 0%, #C5B9AF 100%); }
-  .g2 { background: linear-gradient(135deg, #D4C5BC 0%, #B8A89E 100%); }
-  .g3 { background: linear-gradient(135deg, #EDE8E3 0%, #D4C8C0 100%); }
-  .g4 { background: linear-gradient(135deg, #C8BDB8 0%, #A89890 100%); }
-  .g5 { background: linear-gradient(135deg, #E0D8D0 0%, #C4B8B0 100%); }
-  .g6 { background: linear-gradient(135deg, #D8CEC8 0%, #BEB0A8 100%); }
-
-  /* Product image simulation */
-  .style-card::after {
+  .upload-thumb::after {
     content: '';
     position: absolute;
-    bottom: 8px;
+    bottom: 4px;
     left: 50%;
     transform: translateX(-50%);
-    width: 40px;
-    height: 48px;
-    background: rgba(255,255,255,0.35);
-    border-radius: 4px;
-    backdrop-filter: blur(2px);
+    width: 14px;
+    height: 18px;
+    background: rgba(255,255,255,0.4);
+    border-radius: 2px;
   }
-
-  /* Upload card — first grid cell */
-  .upload-card {
-    aspect-ratio: 4/3;
-    border-radius: 6px;
-    border: 1.5px dashed #A78BFA;
-    background: #FAFAFF;
+  .upload-done-info {
+    flex: 1;
     display: flex;
     flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    gap: 4px;
-    cursor: pointer;
-    transition: background 0.15s, border-color 0.15s;
+    gap: 1px;
   }
-  .upload-card:hover {
-    background: #F3F0FF;
-    border-color: #7C3AED;
-  }
-  .upload-card-icon {
-    font-size: 18px;
-    color: #7C3AED;
-  }
-  .upload-card-text {
-    font-size: 10px;
+  .upload-done-name {
+    font-size: 12px;
     font-weight: 600;
-    color: #7C3AED;
-    text-align: center;
-    line-height: 1.3;
+    color: #6D28D9;
   }
-
-  /* Panel footer */
-  .panel-footer {
-    padding: 10px 12px 12px;
-    display: flex;
-    gap: 8px;
+  .upload-done-sub {
+    font-size: 10px;
+    color: #9CA3AF;
   }
-
-  .btn-cancel {
-    flex: 1;
-    height: 36px;
-    border-radius: 8px;
-    border: 1px solid #E5E7EB;
-    background: #fff;
-    font-size: 13px;
+  .upload-change-btn {
+    font-size: 11px;
     font-weight: 500;
     color: #6B7280;
+    background: #fff;
+    border: 1px solid #E5E7EB;
+    border-radius: 6px;
+    padding: 4px 8px;
     cursor: pointer;
-  }
-  .btn-select {
-    flex: 1;
-    height: 36px;
-    border-radius: 8px;
-    border: none;
-    background: #7C3AED;
-    font-size: 13px;
-    font-weight: 600;
-    color: #fff;
-    cursor: pointer;
+    font-family: 'Pretendard', sans-serif;
+    flex-shrink: 0;
   }
 
-  /* Divider label */
+  /* Divider */
   .divider-label {
     display: flex;
     align-items: center;
@@ -255,25 +225,103 @@
     white-space: nowrap;
   }
 
-  /* Pros */
-  .pros {
-    font-size: 11px;
+  /* Style grid */
+  .style-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 6px;
+  }
+  .style-card {
+    aspect-ratio: 4/3;
+    border-radius: 6px;
+    overflow: hidden;
+    cursor: pointer;
+    position: relative;
+    border: 2px solid transparent;
+    transition: border-color 0.15s;
+  }
+  .style-card:hover { border-color: #C4B5FD; }
+  .style-card.selected { border-color: #7C3AED; }
+  .style-card::after {
+    content: '';
+    position: absolute;
+    bottom: 8px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 40px;
+    height: 48px;
+    background: rgba(255,255,255,0.35);
+    border-radius: 4px;
+  }
+  .g1 { background: linear-gradient(135deg, #E8E0D8 0%, #C5B9AF 100%); }
+  .g2 { background: linear-gradient(135deg, #D4C5BC 0%, #B8A89E 100%); }
+  .g3 { background: linear-gradient(135deg, #EDE8E3 0%, #D4C8C0 100%); }
+  .g4 { background: linear-gradient(135deg, #C8BDB8 0%, #A89890 100%); }
+  .g5 { background: linear-gradient(135deg, #E0D8D0 0%, #C4B8B0 100%); }
+  .g6 { background: linear-gradient(135deg, #D8CEC8 0%, #BEB0A8 100%); }
+
+  /* Panel footer */
+  .panel-footer {
+    padding: 10px 12px 12px;
+    display: flex;
+    gap: 8px;
+  }
+  .btn-cancel {
+    flex: 1;
+    height: 36px;
+    border-radius: 8px;
+    border: 1px solid #E5E7EB;
+    background: #fff;
+    font-size: 13px;
+    font-weight: 500;
     color: #6B7280;
+    cursor: pointer;
+    font-family: 'Pretendard', sans-serif;
+  }
+  .btn-select {
+    flex: 1;
+    height: 36px;
+    border-radius: 8px;
+    border: none;
+    font-size: 13px;
+    font-weight: 600;
+    color: #fff;
+    cursor: pointer;
+    font-family: 'Pretendard', sans-serif;
+    transition: background 0.15s, opacity 0.15s;
+  }
+  .btn-select.active { background: #7C3AED; }
+  .btn-select.inactive { background: #D1D5DB; cursor: default; }
+
+  /* State desc */
+  .state-desc {
+    font-size: 12px;
+    color: #6B7280;
+    text-align: center;
     line-height: 1.6;
     max-width: 340px;
-    text-align: center;
   }
-  .pros strong { color: #374151; }
+  .state-desc strong { color: #374151; }
 </style>
 </head>
 <body>
 
   <div style="position:fixed;top:12px;left:50%;transform:translateX(-50%);z-index:9999;background:#1A1F2B;color:#fff;font-family:'Pretendard',sans-serif;font-size:12px;font-weight:500;padding:6px 14px;border-radius:100px;white-space:nowrap;pointer-events:none;">⚠️ 스타일 미확정 — 플로우·구조만 참고</div>
 
-<!-- Option A -->
-<div class="column">
-  <div class="label">Option A</div>
-  <span class="badge recommended">추천</span>
+  <!-- State switcher -->
+  <div class="state-bar">
+    <button class="state-btn active" onclick="setState(1)">
+      <span class="num">1</span> 초기
+    </button>
+    <button class="state-btn" onclick="setState(2)">
+      <span class="num">2</span> 업로드 완료
+    </button>
+    <button class="state-btn" onclick="setState(3)">
+      <span class="num">3</span> 추천 선택
+    </button>
+  </div>
+
+  <!-- Panel -->
   <div class="panel">
     <div class="panel-header">
       <div class="panel-title-row">
@@ -283,74 +331,81 @@
       <p class="panel-sub">원하는 스타일을 골라주세요. 그 느낌으로 내 제품 배너를 새로 만들어드릴게요</p>
     </div>
     <div class="panel-body">
-      <!-- Upload: full width row -->
-      <div class="upload-full">
+
+      <!-- State 1: 기본 업로드 영역 -->
+      <div id="upload-default" class="upload-full">
         <div class="upload-full-icon">↑</div>
         <span class="upload-full-text">내 이미지로 스타일 지정하기</span>
         <span class="upload-full-sub">클릭 또는 드래그</span>
       </div>
-      <!-- Divider -->
-      <div class="divider-label"><span>또는 추천 스타일 선택</span></div>
-      <!-- Grid -->
-      <div class="style-grid">
-        <div class="style-card g1 selected"></div>
-        <div class="style-card g2"></div>
-        <div class="style-card g3"></div>
-        <div class="style-card g4"></div>
-        <div class="style-card g5"></div>
-        <div class="style-card g6"></div>
-      </div>
-    </div>
-    <div class="panel-footer">
-      <button class="btn-cancel">취소</button>
-      <button class="btn-select">선택</button>
-    </div>
-  </div>
-  <p class="pros">
-    업로드 영역이 넓어 <strong>드래그&드롭 가능</strong><br>
-    추천 스타일과 개념적으로 <strong>명확히 분리</strong><br>
-    추천 이미지 노출 우선순위 유지
-  </p>
-</div>
 
-<!-- Option B -->
-<div class="column">
-  <div class="label">Option B</div>
-  <span class="badge alt">대안</span>
-  <div class="panel">
-    <div class="panel-header">
-      <div class="panel-title-row">
-        <span class="panel-title">스타일 선택</span>
-        <button class="refresh-btn">↻ 새로고침</button>
-      </div>
-      <p class="panel-sub">원하는 스타일을 골라주세요. 그 느낌으로 내 제품 배너를 새로 만들어드릴게요</p>
-    </div>
-    <div class="panel-body">
-      <!-- Grid: upload as first card -->
-      <div class="style-grid">
-        <div class="upload-card">
-          <span class="upload-card-icon">＋</span>
-          <span class="upload-card-text">내 이미지<br>업로드</span>
+      <!-- State 2: 업로드 완료 -->
+      <div id="upload-done" class="upload-done" style="display:none;">
+        <div class="upload-thumb"></div>
+        <div class="upload-done-info">
+          <span class="upload-done-name">내 이미지 · 선택됨</span>
+          <span class="upload-done-sub">스타일 레퍼런스로 사용</span>
         </div>
-        <div class="style-card g1 selected"></div>
-        <div class="style-card g2"></div>
-        <div class="style-card g3"></div>
-        <div class="style-card g4"></div>
-        <div class="style-card g5"></div>
-        <div class="style-card g6"></div>
+        <button class="upload-change-btn">변경</button>
+      </div>
+
+      <div class="divider-label"><span>또는 추천 스타일 선택</span></div>
+
+      <div class="style-grid">
+        <div class="style-card g1" id="card1"></div>
+        <div class="style-card g2" id="card2"></div>
+        <div class="style-card g3" id="card3"></div>
+        <div class="style-card g4" id="card4"></div>
+        <div class="style-card g5" id="card5"></div>
+        <div class="style-card g6" id="card6"></div>
       </div>
     </div>
     <div class="panel-footer">
       <button class="btn-cancel">취소</button>
-      <button class="btn-select">선택</button>
+      <button class="btn-select inactive" id="btn-select">선택</button>
     </div>
   </div>
-  <p class="pros">
-    선택지가 <strong>병렬 배치</strong>라 단순함<br>
-    업로드와 추천이 <strong>동등한 선택지</strong> 느낌<br>
-    추천 1번 이미지가 밀려 <strong>시선 분산</strong>
+
+  <!-- State description -->
+  <p class="state-desc" id="state-desc">
+    아무것도 선택되지 않은 초기 상태.<br>업로드하거나 추천 스타일을 골라야 <strong>선택 버튼 활성화</strong>
   </p>
-</div>
+
+<script>
+  function setState(n) {
+    // Buttons
+    document.querySelectorAll('.state-btn').forEach((b, i) => {
+      b.classList.toggle('active', i + 1 === n);
+    });
+
+    const uploadDefault = document.getElementById('upload-default');
+    const uploadDone = document.getElementById('upload-done');
+    const btnSelect = document.getElementById('btn-select');
+    const desc = document.getElementById('state-desc');
+    const cards = document.querySelectorAll('.style-card');
+
+    // Reset all cards
+    cards.forEach(c => c.classList.remove('selected'));
+
+    if (n === 1) {
+      uploadDefault.style.display = 'flex';
+      uploadDone.style.display = 'none';
+      btnSelect.className = 'btn-select inactive';
+      desc.innerHTML = '아무것도 선택되지 않은 초기 상태.<br>업로드하거나 추천 스타일을 골라야 <strong>선택 버튼 활성화</strong>';
+    } else if (n === 2) {
+      uploadDefault.style.display = 'none';
+      uploadDone.style.display = 'flex';
+      btnSelect.className = 'btn-select active';
+      desc.innerHTML = '업로드 완료 → 내 이미지 <strong>자동 선택(default)</strong>.<br>추천 스타일 클릭 시 내 이미지 선택 해제.';
+    } else if (n === 3) {
+      uploadDefault.style.display = 'flex';
+      uploadDone.style.display = 'none';
+      document.getElementById('card1').classList.add('selected');
+      btnSelect.className = 'btn-select active';
+      desc.innerHTML = '추천 스타일 선택 시 해당 카드 활성화.<br>업로드 영역은 유지 — <strong>언제든 내 이미지로 전환 가능</strong>.';
+    }
+  }
+</script>
 
 </body>
 </html>
