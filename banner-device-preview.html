@@ -26,9 +26,7 @@
     overflow: hidden;
   }
   .panel-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
+    display: flex; align-items: center; justify-content: space-between;
     padding: 14px 16px;
     border-bottom: 1px solid #F3F4F6;
   }
@@ -67,9 +65,35 @@
   }
   .tab.active { color: #7C3AED; border-bottom-color: #7C3AED; font-weight: 600; }
 
+  /* Mockup container — 확대 버튼 */
+  .mockup-container {
+    position: relative;
+    margin-bottom: 12px;
+    cursor: pointer;
+  }
+  .mockup-container:hover .expand-overlay { opacity: 1; }
+  .expand-overlay {
+    position: absolute; inset: 0;
+    background: rgba(0,0,0,0.18);
+    border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    opacity: 0;
+    transition: opacity 0.15s;
+    z-index: 1;
+  }
+  .expand-btn {
+    background: rgba(255,255,255,0.92);
+    border: none; border-radius: 8px;
+    padding: 6px 12px;
+    font-size: 11px; font-weight: 600; color: #374151;
+    font-family: 'Pretendard', sans-serif;
+    cursor: pointer;
+    display: flex; align-items: center; gap: 5px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.12);
+  }
+
   /* PC Browser Mockup */
   .browser-wrap {
-    margin-bottom: 12px;
     border: 1.5px solid #E5E7EB;
     border-radius: 8px;
     overflow: hidden;
@@ -78,24 +102,15 @@
   .browser-bar {
     background: #F9FAFB;
     padding: 5px 8px;
-    display: flex;
-    align-items: center;
-    gap: 4px;
+    display: flex; align-items: center; gap: 4px;
     border-bottom: 1px solid #E5E7EB;
   }
   .dot { width: 6px; height: 6px; border-radius: 50%; }
   .dot-r { background: #FCA5A5; }
   .dot-y { background: #FCD34D; }
   .dot-g { background: #6EE7B7; }
-  .url-bar {
-    flex: 1; height: 12px;
-    background: #E5E7EB; border-radius: 3px; margin-left: 4px;
-  }
-  .browser-banner {
-    width: 100%; height: 52px;
-    display: block;
-    transition: background 0.2s;
-  }
+  .url-bar { flex: 1; height: 12px; background: #E5E7EB; border-radius: 3px; margin-left: 4px; }
+  .browser-banner { width: 100%; height: 52px; display: block; transition: background 0.2s; }
   .browser-body {
     padding: 8px;
     display: flex; flex-direction: column; gap: 5px;
@@ -108,9 +123,7 @@
 
   /* Mobile Phone Mockup */
   .phone-wrap {
-    margin-bottom: 12px;
-    display: flex;
-    justify-content: center;
+    display: flex; justify-content: center;
   }
   .phone {
     width: 110px;
@@ -123,20 +136,11 @@
   .phone-top {
     background: #F9FAFB;
     padding: 6px 0 4px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    display: flex; align-items: center; justify-content: center;
     border-bottom: 1px solid #F3F4F6;
   }
-  .phone-notch {
-    width: 28px; height: 4px;
-    background: #D1D5DB; border-radius: 2px;
-  }
-  .phone-banner {
-    width: 100%; height: 62px;
-    display: block;
-    transition: background 0.2s;
-  }
+  .phone-notch { width: 28px; height: 4px; background: #D1D5DB; border-radius: 2px; }
+  .phone-banner { width: 100%; height: 62px; display: block; transition: background 0.2s; }
   .phone-body {
     padding: 6px;
     display: flex; flex-direction: column; gap: 4px;
@@ -149,18 +153,15 @@
 
   /* Banner grid */
   .banner-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 6px;
-    margin-bottom: 10px;
+    display: grid; grid-template-columns: 1fr 1fr;
+    gap: 6px; margin-bottom: 10px;
   }
   .banner-card {
     border-radius: 6px; height: 60px;
     cursor: pointer;
     border: 2px solid transparent;
     transition: border-color 0.15s, transform 0.1s;
-    user-select: none;
-    position: relative;
+    user-select: none; position: relative;
   }
   .banner-card:hover { transform: scale(1.02); }
   .banner-card.selected { border-color: #7C3AED; box-shadow: 0 0 0 1px #7C3AED; }
@@ -184,8 +185,7 @@
     font-size: 13px; font-weight: 600;
     border: none; border-radius: 8px; cursor: pointer;
     font-family: 'Pretendard', sans-serif;
-    margin-bottom: 6px;
-    transition: background 0.15s;
+    margin-bottom: 6px; transition: background 0.15s;
   }
   .btn-apply:hover { background: #6D28D9; }
   .btn-more {
@@ -221,6 +221,101 @@
   .text-input:focus { border-color: #7C3AED; }
 
   .divider { height: 1px; background: #F3F4F6; margin: 0 -16px; }
+
+  /* ── 전체화면 모달 ── */
+  .modal-backdrop {
+    display: none;
+    position: fixed; inset: 0;
+    background: rgba(17,24,39,0.72);
+    z-index: 100;
+    align-items: center; justify-content: center;
+    backdrop-filter: blur(4px);
+  }
+  .modal-backdrop.open { display: flex; }
+
+  .modal-inner {
+    position: relative;
+    display: flex; flex-direction: column; align-items: center;
+    gap: 20px;
+    animation: fadeUp 0.2s ease;
+  }
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(12px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  .modal-close {
+    position: absolute; top: -40px; right: 0;
+    background: rgba(255,255,255,0.12);
+    border: none; border-radius: 50%;
+    width: 32px; height: 32px;
+    color: #fff; font-size: 16px;
+    cursor: pointer; display: flex; align-items: center; justify-content: center;
+  }
+  .modal-close:hover { background: rgba(255,255,255,0.22); }
+
+  /* 모달 — PC 브라우저 */
+  .modal-browser {
+    width: 560px;
+    border: 2px solid #D1D5DB;
+    border-radius: 12px;
+    overflow: hidden;
+    background: #fff;
+    box-shadow: 0 24px 64px rgba(0,0,0,0.4);
+  }
+  .modal-browser-bar {
+    background: #F3F4F6;
+    padding: 8px 12px;
+    display: flex; align-items: center; gap: 6px;
+    border-bottom: 1px solid #E5E7EB;
+  }
+  .modal-dot { width: 10px; height: 10px; border-radius: 50%; }
+  .modal-url {
+    flex: 1; height: 18px;
+    background: #E5E7EB; border-radius: 4px; margin-left: 8px;
+  }
+  .modal-browser-banner { width: 100%; height: 120px; display: block; }
+  .modal-browser-body {
+    padding: 16px;
+    display: flex; flex-direction: column; gap: 8px;
+    background: #F9FAFB;
+  }
+  .msk { height: 10px; background: #E5E7EB; border-radius: 4px; }
+  .msk.s { width: 50%; }
+  .msk-row { display: flex; gap: 8px; margin-top: 4px; }
+  .msk-card { flex: 1; height: 52px; background: #E5E7EB; border-radius: 6px; }
+
+  /* 모달 — 모바일 폰 */
+  .modal-phone {
+    width: 200px;
+    border: 3px solid #D1D5DB;
+    border-radius: 32px;
+    overflow: hidden;
+    background: #fff;
+    box-shadow: 0 24px 64px rgba(0,0,0,0.4);
+  }
+  .modal-phone-top {
+    background: #F9FAFB;
+    padding: 10px 0 6px;
+    display: flex; align-items: center; justify-content: center;
+    border-bottom: 1px solid #F3F4F6;
+  }
+  .modal-notch { width: 48px; height: 6px; background: #D1D5DB; border-radius: 3px; }
+  .modal-phone-banner { width: 100%; height: 112px; display: block; }
+  .modal-phone-body {
+    padding: 12px;
+    display: flex; flex-direction: column; gap: 8px;
+    background: #F9FAFB;
+  }
+  .mpsk { height: 8px; background: #E5E7EB; border-radius: 3px; }
+  .mpsk.s { width: 55%; }
+  .mpsk-row { display: flex; gap: 6px; margin-top: 4px; }
+  .mpsk-card { flex: 1; height: 40px; background: #E5E7EB; border-radius: 5px; }
+
+  .modal-label {
+    color: rgba(255,255,255,0.6);
+    font-size: 12px; font-weight: 500;
+  }
 </style>
 </head>
 <body>
@@ -251,22 +346,27 @@
       </div>
 
       <div id="pc-ai">
-        <div class="browser-wrap">
-          <div class="browser-bar">
-            <div class="dot dot-r"></div>
-            <div class="dot dot-y"></div>
-            <div class="dot dot-g"></div>
-            <div class="url-bar"></div>
-          </div>
-          <div id="pc-preview" class="browser-banner b1"></div>
-          <div class="browser-body">
-            <div class="sk"></div>
-            <div class="sk s"></div>
-            <div class="sk-row">
-              <div class="sk-card"></div>
-              <div class="sk-card"></div>
-              <div class="sk-card"></div>
+        <div class="mockup-container" onclick="openModal('pc')">
+          <div class="browser-wrap">
+            <div class="browser-bar">
+              <div class="dot dot-r"></div>
+              <div class="dot dot-y"></div>
+              <div class="dot dot-g"></div>
+              <div class="url-bar"></div>
             </div>
+            <div id="pc-preview" class="browser-banner b1"></div>
+            <div class="browser-body">
+              <div class="sk"></div>
+              <div class="sk s"></div>
+              <div class="sk-row">
+                <div class="sk-card"></div>
+                <div class="sk-card"></div>
+                <div class="sk-card"></div>
+              </div>
+            </div>
+          </div>
+          <div class="expand-overlay">
+            <button class="expand-btn">⛶ 크게 보기</button>
           </div>
         </div>
 
@@ -299,24 +399,27 @@
       </div>
 
       <div id="mo-ai">
-        <div class="phone-wrap">
-          <div class="phone">
-            <div class="phone-top">
-              <div class="phone-notch"></div>
-            </div>
-            <div id="mo-preview" class="phone-banner b1"></div>
-            <div class="phone-body">
-              <div class="psk"></div>
-              <div class="psk s"></div>
-              <div class="psk-row">
-                <div class="psk-card"></div>
-                <div class="psk-card"></div>
+        <div class="mockup-container" onclick="openModal('mo')">
+          <div class="phone-wrap">
+            <div class="phone">
+              <div class="phone-top"><div class="phone-notch"></div></div>
+              <div id="mo-preview" class="phone-banner b1"></div>
+              <div class="phone-body">
+                <div class="psk"></div>
+                <div class="psk s"></div>
+                <div class="psk-row">
+                  <div class="psk-card"></div>
+                  <div class="psk-card"></div>
+                </div>
+                <div class="psk-row">
+                  <div class="psk-card"></div>
+                  <div class="psk-card"></div>
+                </div>
               </div>
-              <div class="psk-row">
-                <div class="psk-card"></div>
-                <div class="psk-card"></div>
-              </div>
             </div>
+          </div>
+          <div class="expand-overlay">
+            <button class="expand-btn">⛶ 크게 보기</button>
           </div>
         </div>
 
@@ -339,7 +442,66 @@
   </div>
 </div>
 
+<!-- 모달 -->
+<div class="modal-backdrop" id="modal" onclick="handleBackdropClick(event)">
+  <div class="modal-inner" id="modal-inner">
+    <button class="modal-close" onclick="closeModal()">✕</button>
+
+    <!-- PC 모달 -->
+    <div id="modal-pc" style="display:none;">
+      <div class="modal-browser">
+        <div class="modal-browser-bar">
+          <div class="modal-dot dot-r"></div>
+          <div class="modal-dot dot-y"></div>
+          <div class="modal-dot dot-g"></div>
+          <div class="modal-url"></div>
+        </div>
+        <div id="modal-pc-banner" class="modal-browser-banner b1"></div>
+        <div class="modal-browser-body">
+          <div class="msk"></div>
+          <div class="msk s"></div>
+          <div class="msk-row">
+            <div class="msk-card"></div>
+            <div class="msk-card"></div>
+            <div class="msk-card"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 모바일 모달 -->
+    <div id="modal-mo" style="display:none;">
+      <div class="modal-phone">
+        <div class="modal-phone-top"><div class="modal-notch"></div></div>
+        <div id="modal-mo-banner" class="modal-phone-banner b1"></div>
+        <div class="modal-phone-body">
+          <div class="mpsk"></div>
+          <div class="mpsk s"></div>
+          <div class="mpsk-row">
+            <div class="mpsk-card"></div>
+            <div class="mpsk-card"></div>
+          </div>
+          <div class="mpsk-row">
+            <div class="mpsk-card"></div>
+            <div class="mpsk-card"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <span class="modal-label" id="modal-label"></span>
+  </div>
+</div>
+
 <script>
+  const gradients = {
+    b1: 'linear-gradient(135deg, #a8edea, #fed6e3)',
+    b2: 'linear-gradient(135deg, #c3aed6, #f9e4b7)',
+    b3: 'linear-gradient(135deg, #89f7fe, #66a6ff)',
+    b4: 'linear-gradient(135deg, #fddb92, #d1fdff)',
+  };
+  let currentColor = { pc: 'b1', mo: 'b1' };
+
   function switchTab(section, type) {
     const tabs = document.getElementById(section + '-tabs').querySelectorAll('.tab');
     tabs[0].classList.toggle('active', type === 'upload');
@@ -352,10 +514,38 @@
     const grid = document.getElementById(section + '-grid');
     grid.querySelectorAll('.banner-card').forEach(c => c.classList.remove('selected'));
     el.classList.add('selected');
+    currentColor[section] = colorClass;
 
     const preview = document.getElementById(section + '-preview');
     preview.className = (section === 'pc' ? 'browser-banner' : 'phone-banner') + ' ' + colorClass;
   }
+
+  function openModal(section) {
+    const color = currentColor[section];
+    document.getElementById('modal-pc').style.display = section === 'pc' ? 'block' : 'none';
+    document.getElementById('modal-mo').style.display = section === 'mo' ? 'block' : 'none';
+
+    if (section === 'pc') {
+      document.getElementById('modal-pc-banner').className = 'modal-browser-banner ' + color;
+      document.getElementById('modal-label').textContent = 'PC 배너 미리보기';
+    } else {
+      document.getElementById('modal-mo-banner').className = 'modal-phone-banner ' + color;
+      document.getElementById('modal-label').textContent = '모바일 배너 미리보기';
+    }
+    document.getElementById('modal').classList.add('open');
+    document.body.style.overflow = 'hidden';
+  }
+
+  function closeModal() {
+    document.getElementById('modal').classList.remove('open');
+    document.body.style.overflow = '';
+  }
+
+  function handleBackdropClick(e) {
+    if (e.target === document.getElementById('modal')) closeModal();
+  }
+
+  document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
 </script>
 
 </body>
