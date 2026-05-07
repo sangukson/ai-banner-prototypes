@@ -1,0 +1,773 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=1980">
+  <title>AI 배너 ↔ 빌더 플로우 프로토타입</title>
+  <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css" />
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    :root {
+      --gray-0:#FFFFFF; --gray-25:#FAFBFC; --gray-50:#F4F6F8;
+      --gray-100:#EDF0F3; --gray-150:#E3E7EC; --gray-200:#D5DAE1;
+      --gray-300:#B8C0CC; --gray-400:#8D97A5; --gray-500:#6B7685;
+      --gray-600:#525C6A; --gray-700:#3D4654; --gray-800:#2A3040; --gray-900:#1A1F2B;
+      --purple-50:#F5F2FF; --purple-100:#EBE5FF; --purple-500:#7C5CFC; --purple-600:#6644E5;
+      --bg-app:var(--gray-25); --bg-surface:var(--gray-0); --bg-surface-secondary:var(--gray-50);
+      --bg-brand:var(--purple-500); --bg-brand-subtle:var(--purple-50);
+      --text-primary:var(--gray-800); --text-secondary:var(--gray-600);
+      --text-tertiary:var(--gray-400); --text-brand:var(--purple-500);
+      --border-default:var(--gray-150);
+    }
+    body {
+      font-family:'Pretendard',-apple-system,BlinkMacSystemFont,sans-serif;
+      background:var(--bg-app); width:1980px; min-height:1244px;
+      display:flex; letter-spacing:-0.01em; color:var(--text-primary); overflow:hidden;
+    }
+
+    /* ─── Sidebar ─── */
+    .sidebar {
+      width:68px; min-height:1244px; background:var(--gray-900);
+      display:flex; flex-direction:column; align-items:center;
+      padding:16px 0; gap:4px; flex-shrink:0;
+    }
+    .logo { width:36px; height:36px; background:var(--purple-500); border-radius:10px;
+      display:flex; align-items:center; justify-content:center;
+      color:white; font-size:18px; font-weight:700; margin-bottom:16px; }
+    .nav-item { width:48px; height:48px; border-radius:10px;
+      display:flex; flex-direction:column; align-items:center; justify-content:center; gap:3px; cursor:pointer; }
+    .nav-item.active { background:rgba(124,92,252,0.15); }
+    .nav-item svg { opacity:0.45; }
+    .nav-item.active svg { opacity:1; }
+    .nav-label { font-size:9px; font-weight:500; color:var(--gray-400); }
+    .nav-item.active .nav-label { color:var(--purple-500); }
+
+    /* ─── Screen ─── */
+    .screen { flex:1; display:flex; flex-direction:column; min-height:1244px; overflow:hidden; }
+
+    /* ─── Topbar ─── */
+    .topbar {
+      height:64px; background:var(--bg-surface); border-bottom:1px solid var(--border-default);
+      padding:0 28px; display:flex; align-items:center; justify-content:space-between; flex-shrink:0;
+    }
+    .topbar-left { display:flex; align-items:center; gap:8px; }
+    .breadcrumb { display:flex; align-items:center; gap:6px; font-size:12px; color:var(--text-tertiary); }
+    .breadcrumb-sep { color:var(--gray-300); }
+    .breadcrumb-current { color:var(--text-primary); font-weight:600; font-size:13px; }
+    .credit-pill {
+      display:flex; align-items:center; gap:5px;
+      background:var(--bg-surface-secondary); border:1px solid var(--border-default);
+      border-radius:20px; padding:4px 11px; font-size:12px; color:var(--text-secondary);
+    }
+    .credit-dot { width:6px; height:6px; background:var(--purple-500); border-radius:50%; }
+
+    /* ─── Body split ─── */
+    .body-split { flex:1; display:flex; overflow:hidden; }
+
+    /* ─── Left panel ─── */
+    .left-panel {
+      width:520px; flex-shrink:0; border-right:1px solid var(--border-default);
+      background:var(--bg-surface); display:flex; flex-direction:column; overflow-y:auto;
+    }
+    .purpose-section { padding:20px 24px 0; }
+    .section-label { font-size:13px; font-weight:600; color:var(--text-brand); letter-spacing:-0.01em; margin-bottom:12px; }
+    .purpose-cards { display:grid; grid-template-columns:repeat(3,1fr); gap:8px; }
+    .purpose-card { border:1.5px solid var(--border-default); border-radius:10px; overflow:hidden; cursor:pointer; }
+    .purpose-card.sel { border-color:var(--purple-500); background:var(--purple-50); }
+    .purpose-card-top { padding:8px 10px 5px; }
+    .pc-title { font-size:11px; font-weight:600; color:var(--text-primary); letter-spacing:-0.02em; }
+    .pc-desc { font-size:9px; color:var(--text-tertiary); margin-top:2px; }
+    .purpose-card-img { height:56px; margin:4px 6px 6px; border-radius:6px; }
+    .pg1 { background:linear-gradient(135deg,#f5e6c8,#e8c47a); }
+    .pg2 { background:linear-gradient(135deg,#ffd6e0,#f9a8c5); }
+    .pg3 { background:linear-gradient(135deg,#2a2a2a,#1a1a1a); }
+    .form-divider { height:1px; background:var(--border-default); margin:16px 24px 0; }
+    .form-wrap { padding:20px 24px 32px; display:flex; flex-direction:column; gap:16px; }
+    .field { display:flex; flex-direction:column; gap:5px; }
+    .field-label { font-size:12px; font-weight:500; color:var(--text-secondary); }
+    .field-value { font-size:13px; color:var(--text-primary); }
+    .field-row { display:flex; align-items:center; gap:8px; }
+    .uploaded-img { width:48px; height:48px; border-radius:6px; border:1px solid var(--border-default); }
+    .up1 { background:linear-gradient(135deg,#fde68a,#f59e0b); }
+    .up2 { background:linear-gradient(135deg,#bfdbfe,#93c5fd); }
+    .style-tag {
+      height:28px; padding:0 10px; background:var(--purple-50);
+      border:1px solid var(--purple-100); border-radius:6px;
+      font-size:11px; font-weight:500; color:var(--text-brand);
+      display:flex; align-items:center;
+    }
+    .regen-btn {
+      height:52px; background:var(--bg-brand); border:none; border-radius:10px;
+      font-size:15px; font-weight:700; color:white; cursor:pointer;
+      font-family:inherit; letter-spacing:-0.02em;
+      display:flex; align-items:center; justify-content:center; gap:8px;
+      box-shadow:0 4px 16px rgba(124,92,252,0.3); margin-top:4px;
+    }
+    .regen-btn:hover { background:var(--purple-600); }
+
+    /* ─── Right panel (AI result) ─── */
+    .right-panel { flex:1; padding:24px 28px; display:flex; flex-direction:column; gap:16px; overflow-y:auto; }
+    .preview-tabs { display:flex; border:1px solid var(--border-default); border-radius:8px; overflow:hidden; }
+    .preview-tab { flex:1; height:40px; display:flex; align-items:center; justify-content:center;
+      gap:6px; font-size:13px; font-weight:500; cursor:pointer; }
+    .preview-tab.active { background:var(--purple-50); color:var(--text-brand); }
+    .preview-tab:not(.active) { color:var(--text-tertiary); }
+    .result-header { display:flex; align-items:flex-start; justify-content:space-between; }
+    .result-title { font-size:15px; font-weight:600; color:var(--text-primary); letter-spacing:-0.02em; }
+    .result-sub { font-size:12px; color:var(--text-tertiary); margin-top:3px; }
+    .outline-btn {
+      height:34px; padding:0 14px; border:1px solid var(--border-default);
+      border-radius:8px; font-size:12px; font-weight:500; color:var(--text-secondary);
+      background:none; cursor:pointer; font-family:inherit;
+      display:flex; align-items:center; gap:5px; flex-shrink:0;
+    }
+    .result-grid { display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+    .result-card {
+      border-radius:12px; overflow:hidden; border:2px solid transparent;
+      position:relative; cursor:pointer; transition:border-color 0.15s;
+      background:var(--bg-surface);
+    }
+    .result-card:hover { border-color:var(--purple-500); }
+    .result-img { height:148px; position:relative; }
+    .rb1 { background:linear-gradient(135deg,#f5e6c8 0%,#e8c47a 100%); }
+    .rb2 { background:linear-gradient(135deg,#ffd6e0 0%,#f9a8c5 100%); }
+    .rb3 { background:linear-gradient(135deg,#d1fae5 0%,#6ee7b7 100%); }
+    .rb4 { background:linear-gradient(135deg,#e0f2fe 0%,#7dd3fc 100%); }
+    .banner-mock { position:absolute; inset:0; padding:14px 18px; display:flex; justify-content:space-between; align-items:center; }
+    .banner-text-group { display:flex; flex-direction:column; gap:5px; }
+    .bml1 { height:10px; border-radius:5px; }
+    .bml2 { height:7px; border-radius:4px; opacity:0.6; }
+    .bml3 { height:6px; border-radius:3px; opacity:0.35; margin-top:2px; }
+    .rb1 .bml1 { width:88px; background:#92400e; } .rb1 .bml2 { width:62px; background:#b45309; } .rb1 .bml3 { width:46px; background:#b45309; }
+    .rb2 .bml1 { width:84px; background:#9d174d; } .rb2 .bml2 { width:58px; background:#be185d; } .rb2 .bml3 { width:44px; background:#be185d; }
+    .rb3 .bml1 { width:80px; background:#065f46; } .rb3 .bml2 { width:56px; background:#047857; } .rb3 .bml3 { width:42px; background:#047857; }
+    .rb4 .bml1 { width:86px; background:#0369a1; } .rb4 .bml2 { width:60px; background:#0284c7; } .rb4 .bml3 { width:45px; background:#0284c7; }
+    .banner-product-shape { width:56px; height:68px; border-radius:8px; box-shadow:0 4px 16px rgba(0,0,0,0.12); flex-shrink:0; }
+    .rb1 .banner-product-shape { background:linear-gradient(160deg,#fde68a,#f59e0b); }
+    .rb2 .banner-product-shape { background:linear-gradient(160deg,#fbcfe8,#f472b6); border-radius:50%; }
+    .rb3 .banner-product-shape { background:linear-gradient(160deg,#6ee7b7,#34d399); }
+    .rb4 .banner-product-shape { background:linear-gradient(160deg,#7dd3fc,#38bdf8); }
+    .result-overlay {
+      position:absolute; inset:0; background:rgba(0,0,0,0.38);
+      display:flex; align-items:center; justify-content:center;
+      opacity:0; transition:opacity 0.15s;
+    }
+    .result-card:hover .result-overlay { opacity:1; }
+    .edit-btn {
+      height:38px; padding:0 18px; background:white; border:none; border-radius:8px;
+      font-size:13px; font-weight:600; color:var(--gray-900); cursor:pointer;
+      font-family:inherit; letter-spacing:-0.01em;
+      display:flex; align-items:center; gap:6px;
+    }
+    .result-foot {
+      padding:10px 13px; border-top:1px solid var(--border-default);
+      background:var(--bg-surface); display:flex; align-items:center; justify-content:space-between;
+    }
+    .result-foot-label { font-size:11px; font-weight:500; color:var(--text-secondary); }
+    .result-foot-num { font-size:11px; color:var(--text-tertiary); }
+    .info-strip {
+      background:var(--bg-brand-subtle); border-radius:10px; padding:14px 18px;
+    }
+    .info-strip-title { font-size:13px; font-weight:600; color:var(--text-brand); letter-spacing:-0.02em; }
+    .info-strip-sub { font-size:11px; color:var(--purple-500); opacity:0.7; margin-top:2px; }
+
+    /* ─── Builder topbar ─── */
+    .builder-topbar {
+      height:52px; background:var(--bg-surface); border-bottom:1px solid var(--border-default);
+      display:flex; align-items:center; justify-content:space-between;
+      padding:0 16px; flex-shrink:0;
+    }
+    .builder-topbar-group { display:flex; align-items:center; gap:8px; }
+    .icon-btn {
+      width:34px; height:34px; border-radius:8px; border:1px solid var(--border-default);
+      background:var(--bg-surface); display:flex; align-items:center; justify-content:center;
+      cursor:pointer; color:var(--text-secondary);
+    }
+    .icon-btn:hover { background:var(--bg-surface-secondary); }
+    .zoom-pill {
+      height:34px; padding:0 12px; border:1px solid var(--border-default); border-radius:8px;
+      font-size:12px; color:var(--text-secondary); display:flex; align-items:center; gap:5px;
+    }
+    .save-btn {
+      height:34px; padding:0 16px; background:var(--bg-brand); color:white; border:none;
+      border-radius:8px; font-size:13px; font-weight:600; cursor:pointer; font-family:inherit;
+    }
+    .export-btn {
+      height:34px; padding:0 16px; background:none; border:1px solid var(--border-default);
+      border-radius:8px; font-size:13px; color:var(--text-secondary); cursor:pointer; font-family:inherit;
+    }
+
+    /* ─── Builder body ─── */
+    .builder-body { flex:1; display:flex; overflow:hidden; }
+
+    /* Tools */
+    .builder-tools {
+      width:56px; background:var(--bg-surface); border-right:1px solid var(--border-default);
+      display:flex; flex-direction:column; align-items:center; padding:12px 0; gap:4px; flex-shrink:0;
+    }
+    .tool-btn {
+      width:40px; height:40px; border-radius:8px;
+      display:flex; flex-direction:column; align-items:center; justify-content:center; gap:2px; cursor:pointer;
+      color:var(--text-tertiary);
+    }
+    .tool-btn.active { background:var(--purple-50); color:var(--text-brand); }
+    .tool-btn:hover:not(.active) { background:var(--bg-surface-secondary); }
+    .tool-label { font-size:9px; font-weight:500; }
+
+    /* Canvas area */
+    .builder-canvas-area {
+      flex:1; background:var(--gray-100); display:flex; align-items:center; justify-content:center;
+      position:relative; overflow:hidden;
+    }
+    .canvas-panel {
+      width:760px; height:253px; background:white; border-radius:4px;
+      box-shadow:0 4px 32px rgba(0,0,0,0.15); position:relative; overflow:hidden;
+    }
+    .canvas-bg { position:absolute; inset:0; transition:background 0.35s ease; }
+    .cbg1 { background:linear-gradient(135deg,#f5e6c8 0%,#e8c47a 100%); }
+    .cbg2 { background:linear-gradient(135deg,#ffd6e0 0%,#f9a8c5 100%); }
+    .cbg3 { background:linear-gradient(135deg,#d1fae5 0%,#6ee7b7 100%); }
+    .cbg4 { background:linear-gradient(135deg,#e0f2fe 0%,#7dd3fc 100%); }
+    .cbg5 { background:linear-gradient(135deg,#ede9fe 0%,#c4b5fd 100%); }
+    .cbg6 { background:linear-gradient(135deg,#fef9c3 0%,#fde68a 100%); }
+    .canvas-content { position:absolute; inset:0; padding:24px 32px; display:flex; justify-content:space-between; align-items:center; }
+    .canvas-text-block { display:flex; flex-direction:column; gap:8px; position:relative; }
+    .canvas-kicker { font-size:10px; font-weight:600; color:rgba(92,40,14,0.55); letter-spacing:0.06em; text-transform:uppercase; }
+    .canvas-headline { font-size:22px; font-weight:800; color:#92400e; line-height:1.2; letter-spacing:-0.03em; }
+    .canvas-sub { font-size:11px; color:rgba(92,40,14,0.6); letter-spacing:-0.01em; }
+    .canvas-cta {
+      margin-top:8px; height:30px; padding:0 16px; background:#92400e; color:white;
+      border:none; border-radius:6px; font-size:11px; font-weight:600;
+      display:inline-flex; align-items:center; width:fit-content; cursor:pointer; font-family:inherit;
+    }
+    .canvas-product {
+      width:76px; height:96px; border-radius:10px;
+      background:linear-gradient(160deg,#fde68a,#f59e0b);
+      box-shadow:0 8px 24px rgba(0,0,0,0.15); flex-shrink:0;
+    }
+    .sel-box { position:absolute; border:1.5px solid var(--purple-500); border-radius:3px; pointer-events:none; top:-10px; left:-10px; right:-10px; bottom:-10px; }
+    .sel-h { position:absolute; width:7px; height:7px; background:var(--purple-500); border:1.5px solid white; border-radius:1.5px; }
+    .sel-tl { top:-4px; left:-4px; } .sel-tr { top:-4px; right:-4px; }
+    .sel-bl { bottom:-4px; left:-4px; } .sel-br { bottom:-4px; right:-4px; }
+    .ai-badge {
+      position:absolute; top:10px; left:10px;
+      background:rgba(124,92,252,0.9); color:white;
+      font-size:10px; font-weight:600; padding:3px 8px; border-radius:4px;
+      display:flex; align-items:center; gap:3px; letter-spacing:-0.01em;
+    }
+
+    /* ─── Builder right panel ─── */
+    .builder-right {
+      width:300px; background:var(--bg-surface); border-left:1px solid var(--border-default);
+      display:flex; flex-direction:column; flex-shrink:0;
+    }
+    .panel-tabs { display:flex; border-bottom:1px solid var(--border-default); flex-shrink:0; }
+    .panel-tab {
+      flex:1; height:44px; display:flex; align-items:center; justify-content:center;
+      font-size:12px; font-weight:500; cursor:pointer; color:var(--text-tertiary);
+      border-bottom:2px solid transparent; transition:all 0.15s; letter-spacing:-0.01em;
+    }
+    .panel-tab.active { color:var(--text-brand); border-bottom-color:var(--purple-500); }
+    .panel-body { flex:1; overflow-y:auto; padding:16px; display:flex; flex-direction:column; gap:14px; }
+    .panel-section-title { font-size:13px; font-weight:600; color:var(--text-primary); letter-spacing:-0.02em; }
+    .panel-section-sub { font-size:11px; color:var(--text-tertiary); margin-top:3px; letter-spacing:-0.01em; }
+    .ai-thumb-grid { display:grid; grid-template-columns:1fr 1fr; gap:8px; }
+    .ai-thumb {
+      border-radius:8px; overflow:hidden; border:2px solid transparent;
+      cursor:pointer; transition:border-color 0.15s; position:relative;
+      background:var(--bg-surface);
+    }
+    .ai-thumb:hover:not(.active) { border-color:var(--gray-300); }
+    .ai-thumb.active { border-color:var(--purple-500); }
+    .ai-thumb-img { height:68px; }
+    .at1 { background:linear-gradient(135deg,#f5e6c8,#e8c47a); }
+    .at2 { background:linear-gradient(135deg,#ffd6e0,#f9a8c5); }
+    .at3 { background:linear-gradient(135deg,#d1fae5,#6ee7b7); }
+    .at4 { background:linear-gradient(135deg,#e0f2fe,#7dd3fc); }
+    .at5 { background:linear-gradient(135deg,#ede9fe,#c4b5fd); }
+    .at6 { background:linear-gradient(135deg,#fef9c3,#fde68a); }
+    .ai-thumb-label { padding:5px 7px; font-size:10px; color:var(--text-tertiary); }
+    .active-badge {
+      position:absolute; top:5px; right:5px; background:var(--purple-500); color:white;
+      width:16px; height:16px; border-radius:50%;
+      display:flex; align-items:center; justify-content:center; font-size:9px;
+    }
+    .ai-thumb:not(.active) .active-badge { display:none; }
+    .goto-ai-btn {
+      display:flex; align-items:center; justify-content:center; gap:6px;
+      padding:12px; border:1px dashed var(--border-default); border-radius:8px;
+      font-size:12px; color:var(--text-brand); cursor:pointer;
+      font-weight:500; background:none; font-family:inherit; width:100%;
+      letter-spacing:-0.01em; transition:background 0.15s;
+    }
+    .goto-ai-btn:hover { background:var(--purple-50); }
+    .layer-placeholder { flex:1; display:flex; align-items:center; justify-content:center; color:var(--text-tertiary); font-size:12px; }
+
+    /* ─── Popup ─── */
+    .popup-overlay {
+      position:fixed; inset:0; background:rgba(26,31,43,0.6);
+      backdrop-filter:blur(4px); display:flex; align-items:center; justify-content:center;
+      z-index:300; animation:fadeIn 0.2s ease;
+    }
+    .popup-overlay.hidden { display:none; }
+    @keyframes fadeIn { from { opacity:0; } to { opacity:1; } }
+    .popup-card {
+      background:var(--bg-surface); border-radius:20px; width:480px;
+      box-shadow:0 8px 48px rgba(0,0,0,0.22); overflow:hidden;
+      animation:slideUp 0.25s cubic-bezier(0.16,1,0.3,1);
+    }
+    @keyframes slideUp { from { opacity:0; transform:translateY(20px) scale(0.97); } to { opacity:1; transform:translateY(0) scale(1); } }
+    .popup-preview { height:156px; position:relative; }
+    .popup-preview-inner { position:absolute; inset:0; display:flex; justify-content:space-between; align-items:center; padding:16px 24px; }
+    .popup-body { padding:24px 28px 28px; }
+    .popup-icon {
+      width:40px; height:40px; background:var(--purple-50); border-radius:10px;
+      display:flex; align-items:center; justify-content:center; margin-bottom:14px;
+    }
+    .popup-title { font-size:18px; font-weight:700; color:var(--text-primary); letter-spacing:-0.03em; }
+    .popup-desc { font-size:13px; color:var(--text-tertiary); margin-top:6px; line-height:1.6; letter-spacing:-0.01em; }
+    .popup-btns { display:flex; gap:10px; margin-top:24px; }
+    .popup-cancel {
+      flex:1; height:48px; background:none; border:1px solid var(--border-default);
+      border-radius:10px; font-size:14px; color:var(--text-secondary); cursor:pointer; font-family:inherit;
+    }
+    .popup-confirm {
+      flex:2; height:48px; background:var(--bg-brand); color:white; border:none;
+      border-radius:10px; font-size:14px; font-weight:700; cursor:pointer; font-family:inherit;
+      letter-spacing:-0.02em; display:flex; align-items:center; justify-content:center; gap:8px;
+      box-shadow:0 4px 16px rgba(124,92,252,0.3);
+    }
+    .popup-confirm:hover { background:var(--purple-600); }
+
+    /* ─── Demo controls ─── */
+    .demo-controls {
+      position:fixed; bottom:32px; right:32px; z-index:20;
+      display:flex; flex-direction:column; align-items:center; gap:6px;
+    }
+    .demo-btns { display:flex; gap:8px; }
+    .demo-btn {
+      height:38px; padding:0 16px; border-radius:20px; border:none;
+      font-size:12px; font-weight:600; cursor:pointer; font-family:inherit; transition:all 0.15s;
+    }
+    .demo-btn.active { background:var(--gray-900); color:white; }
+    .demo-btn:not(.active) { background:var(--bg-surface); color:var(--text-secondary); border:1px solid var(--border-default); }
+    .demo-hint { font-size:11px; color:var(--text-tertiary); }
+  </style>
+</head>
+<body>
+
+<!-- Sidebar -->
+<aside class="sidebar">
+  <div class="logo">α</div>
+  <div class="nav-item">
+    <svg width="20" height="20" fill="none" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1" fill="white"/><rect x="14" y="3" width="7" height="7" rx="1" fill="white"/><rect x="3" y="14" width="7" height="7" rx="1" fill="white"/><rect x="14" y="14" width="7" height="7" rx="1" fill="white"/></svg>
+    <span class="nav-label">홈</span>
+  </div>
+  <div class="nav-item active">
+    <svg width="20" height="20" fill="none" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2" stroke="#7C5CFC" stroke-width="1.8"/><path d="M8 12h8M12 8v8" stroke="#7C5CFC" stroke-width="1.8" stroke-linecap="round"/></svg>
+    <span class="nav-label">스튜디오</span>
+  </div>
+  <div class="nav-item">
+    <svg width="20" height="20" fill="none" viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h10" stroke="white" stroke-width="1.8" stroke-linecap="round"/></svg>
+    <span class="nav-label">배너</span>
+  </div>
+  <div class="nav-item">
+    <svg width="20" height="20" fill="none" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" stroke="white" stroke-width="1.8"/><path d="M12 8v4l3 3" stroke="white" stroke-width="1.8" stroke-linecap="round"/></svg>
+    <span class="nav-label">설정</span>
+  </div>
+</aside>
+
+<!-- ══════════ SCREEN A: AI 배너 생성 결과 ══════════ -->
+<div id="screen-ai" class="screen">
+  <div class="topbar">
+    <div class="topbar-left">
+      <div class="breadcrumb">
+        <span>콘텐츠 스튜디오</span>
+        <span class="breadcrumb-sep">›</span>
+        <span class="breadcrumb-current">AI 배너 생성</span>
+      </div>
+    </div>
+    <div class="credit-pill">
+      <div class="credit-dot"></div>
+      남은 AI 배너 생성 수 47/50
+    </div>
+  </div>
+
+  <div class="body-split">
+    <!-- Left: 입력 요약 -->
+    <div class="left-panel">
+      <div class="purpose-section">
+        <div class="section-label">배너 목적</div>
+        <div class="purpose-cards">
+          <div class="purpose-card sel">
+            <div class="purpose-card-top"><div class="pc-title">제품 / 카테고리</div><div class="pc-desc">브랜드·카테고리별 상품</div></div>
+            <div class="purpose-card-img pg1"></div>
+          </div>
+          <div class="purpose-card">
+            <div class="purpose-card-top"><div class="pc-title">기획전 / 프로모션</div><div class="pc-desc">할인, 시즌오프 등 이벤트</div></div>
+            <div class="purpose-card-img pg2"></div>
+          </div>
+          <div class="purpose-card">
+            <div class="purpose-card-top"><div class="pc-title">일반 혜택 홍보</div><div class="pc-desc">회원 전용 혜택·쿠폰</div></div>
+            <div class="purpose-card-img pg3"></div>
+          </div>
+        </div>
+      </div>
+      <div class="form-divider"></div>
+      <div class="form-wrap">
+        <div class="section-label" style="margin-bottom:0;">제품 정보 입력</div>
+        <div class="field">
+          <div class="field-label">제품명</div>
+          <div class="field-value">알파캔버스 수분 크림</div>
+        </div>
+        <div class="field">
+          <div class="field-label">이미지</div>
+          <div class="field-row">
+            <div class="uploaded-img up1"></div>
+            <div class="uploaded-img up2"></div>
+            <span style="font-size:11px; color:var(--text-tertiary);">2장 업로드됨</span>
+          </div>
+        </div>
+        <div class="field">
+          <div class="field-label">참고 스타일</div>
+          <div class="field-row"><div class="style-tag">클린 플로팅</div></div>
+        </div>
+        <div class="field">
+          <div class="field-label">이미지 생성 개수</div>
+          <div class="field-value">3장</div>
+        </div>
+        <div class="field">
+          <div class="field-label">추가 요청사항</div>
+          <div class="field-value" style="font-size:12px; color:var(--text-tertiary);">따뜻하고 봄 느낌으로, 파스텔 톤 배경 원해요</div>
+        </div>
+        <button class="regen-btn">
+          <svg width="15" height="15" fill="none" viewBox="0 0 24 24"><path d="M4 4v6h6M20 20v-6h-6M4.93 15A9 9 0 1019.07 9" stroke="white" stroke-width="2" stroke-linecap="round"/></svg>
+          다시 생성하기
+        </button>
+      </div>
+    </div>
+
+    <!-- Right: 생성 결과 -->
+    <div class="right-panel">
+      <div class="preview-tabs">
+        <div class="preview-tab active">
+          <svg width="13" height="13" fill="none" viewBox="0 0 24 24"><rect x="2" y="4" width="20" height="16" rx="2" stroke="#6644E5" stroke-width="1.8"/></svg>
+          데스크탑
+        </div>
+        <div class="preview-tab">
+          <svg width="13" height="13" fill="none" viewBox="0 0 24 24"><rect x="7" y="2" width="10" height="20" rx="2" stroke="#8D97A5" stroke-width="1.8"/></svg>
+          모바일
+        </div>
+      </div>
+
+      <div class="result-header">
+        <div>
+          <div class="result-title">생성된 배너 3장</div>
+          <div class="result-sub">마음에 드는 배너에 마우스를 올려 빌더에서 편집해보세요</div>
+        </div>
+        <button class="outline-btn">
+          <svg width="12" height="12" fill="none" viewBox="0 0 24 24"><path d="M4 4v6h6M20 20v-6h-6M4.93 15A9 9 0 1019.07 9" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+          재생성
+        </button>
+      </div>
+
+      <div class="result-grid">
+        <div class="result-card">
+          <div class="result-img rb1">
+            <div class="banner-mock">
+              <div class="banner-text-group"><div class="bml1"></div><div class="bml2"></div><div class="bml3"></div></div>
+              <div class="banner-product-shape"></div>
+            </div>
+          </div>
+          <div class="result-overlay">
+            <button class="edit-btn" onclick="openPopup('rb1')">
+              <svg width="13" height="13" fill="none" viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7" stroke="#1A1F2B" stroke-width="1.8" stroke-linecap="round"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z" stroke="#1A1F2B" stroke-width="1.8" stroke-linecap="round"/></svg>
+              빌더에서 편집하기
+            </button>
+          </div>
+          <div class="result-foot"><span class="result-foot-label">웜 스틸라이프</span><span class="result-foot-num">#1</span></div>
+        </div>
+
+        <div class="result-card">
+          <div class="result-img rb2">
+            <div class="banner-mock">
+              <div class="banner-text-group"><div class="bml1"></div><div class="bml2"></div><div class="bml3"></div></div>
+              <div class="banner-product-shape"></div>
+            </div>
+          </div>
+          <div class="result-overlay">
+            <button class="edit-btn" onclick="openPopup('rb2')">
+              <svg width="13" height="13" fill="none" viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7" stroke="#1A1F2B" stroke-width="1.8" stroke-linecap="round"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z" stroke="#1A1F2B" stroke-width="1.8" stroke-linecap="round"/></svg>
+              빌더에서 편집하기
+            </button>
+          </div>
+          <div class="result-foot"><span class="result-foot-label">소프트 핑크</span><span class="result-foot-num">#2</span></div>
+        </div>
+
+        <div class="result-card">
+          <div class="result-img rb3">
+            <div class="banner-mock">
+              <div class="banner-text-group"><div class="bml1"></div><div class="bml2"></div><div class="bml3"></div></div>
+              <div class="banner-product-shape"></div>
+            </div>
+          </div>
+          <div class="result-overlay">
+            <button class="edit-btn" onclick="openPopup('rb3')">
+              <svg width="13" height="13" fill="none" viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7" stroke="#1A1F2B" stroke-width="1.8" stroke-linecap="round"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z" stroke="#1A1F2B" stroke-width="1.8" stroke-linecap="round"/></svg>
+              빌더에서 편집하기
+            </button>
+          </div>
+          <div class="result-foot"><span class="result-foot-label">내추럴 그린</span><span class="result-foot-num">#3</span></div>
+        </div>
+
+        <div class="result-card" style="opacity:0.45; pointer-events:none;">
+          <div class="result-img rb4">
+            <div class="banner-mock">
+              <div class="banner-text-group"><div class="bml1"></div><div class="bml2"></div></div>
+              <div class="banner-product-shape"></div>
+            </div>
+          </div>
+          <div class="result-foot"><span class="result-foot-label">쿨 블루 (모바일)</span><span class="result-foot-num">#4</span></div>
+        </div>
+      </div>
+
+      <div class="info-strip">
+        <div class="info-strip-title">배너에 텍스트·로고를 직접 추가하려면?</div>
+        <div class="info-strip-sub">각 배너에 마우스를 올리면 빌더로 이동할 수 있어요</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════ SCREEN B: 빌더 ══════════ -->
+<div id="screen-builder" class="screen" style="display:none;">
+  <div class="builder-topbar">
+    <div class="builder-topbar-group">
+      <div class="breadcrumb">
+        <span>콘텐츠 스튜디오</span>
+        <span class="breadcrumb-sep">›</span>
+        <span class="breadcrumb-current">배너 빌더</span>
+        <span class="breadcrumb-sep">›</span>
+        <span style="font-size:12px; color:var(--text-secondary);">알파캔버스 수분 크림 배너</span>
+      </div>
+    </div>
+    <div class="builder-topbar-group">
+      <div class="icon-btn" title="실행취소">
+        <svg width="14" height="14" fill="none" viewBox="0 0 24 24"><path d="M9 14L4 9l5-5M4 9h11a6 6 0 010 12h-3" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </div>
+      <div class="icon-btn" title="다시실행">
+        <svg width="14" height="14" fill="none" viewBox="0 0 24 24"><path d="M15 14l5-5-5-5M19 9H8a6 6 0 000 12h3" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </div>
+      <div class="zoom-pill">
+        <svg width="11" height="11" fill="none" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8" stroke="currentColor" stroke-width="1.8"/><path d="M21 21l-4.35-4.35" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+        50%
+      </div>
+      <button class="export-btn">내보내기</button>
+      <button class="save-btn">저장</button>
+    </div>
+  </div>
+
+  <div class="builder-body">
+    <!-- Tools -->
+    <div class="builder-tools">
+      <div class="tool-btn active">
+        <svg width="16" height="16" fill="none" viewBox="0 0 24 24"><path d="M5 3l14 9-7 2-3 7L5 3z" stroke="#7C5CFC" stroke-width="1.8" stroke-linejoin="round"/></svg>
+        <span class="tool-label" style="color:#7C5CFC;">선택</span>
+      </div>
+      <div class="tool-btn">
+        <svg width="16" height="16" fill="none" viewBox="0 0 24 24"><path d="M17 3a2.828 2.828 0 114 4L7.5 20.5 3 21l.5-4.5L17 3z" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+        <span class="tool-label">텍스트</span>
+      </div>
+      <div class="tool-btn">
+        <svg width="16" height="16" fill="none" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2" stroke="currentColor" stroke-width="1.8"/></svg>
+        <span class="tool-label">도형</span>
+      </div>
+      <div class="tool-btn">
+        <svg width="16" height="16" fill="none" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2" stroke="currentColor" stroke-width="1.8"/><circle cx="8.5" cy="8.5" r="1.5" fill="currentColor"/><path d="M21 15l-5-5L5 21" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+        <span class="tool-label">이미지</span>
+      </div>
+    </div>
+
+    <!-- Canvas -->
+    <div class="builder-canvas-area">
+      <div class="canvas-panel">
+        <div class="canvas-bg cbg1" id="canvasBg"></div>
+        <div class="ai-badge">
+          <svg width="10" height="10" fill="white" viewBox="0 0 24 24"><path d="M12 2l2.09 6.26L20 10l-5.91 1.74L12 18l-2.09-6.26L4 10l5.91-1.74L12 2z"/></svg>
+          AI 생성
+        </div>
+        <div class="canvas-content">
+          <div class="canvas-text-block">
+            <div class="canvas-kicker">스킨케어 · 수분크림</div>
+            <div class="canvas-headline">촉촉하고<br>생기있는 피부</div>
+            <div class="canvas-sub">알파캔버스 수분 크림으로<br>매일 아침을 시작하세요</div>
+            <button class="canvas-cta">지금 바로 구매</button>
+            <div class="sel-box">
+              <div class="sel-h sel-tl"></div><div class="sel-h sel-tr"></div>
+              <div class="sel-h sel-bl"></div><div class="sel-h sel-br"></div>
+            </div>
+          </div>
+          <div class="canvas-product"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Right panel -->
+    <div class="builder-right">
+      <div class="panel-tabs">
+        <div class="panel-tab" onclick="switchTab('layer', this)">레이어</div>
+        <div class="panel-tab" onclick="switchTab('props', this)">속성</div>
+        <div class="panel-tab active" onclick="switchTab('ai', this)">AI 이미지</div>
+      </div>
+
+      <!-- AI 이미지 탭 -->
+      <div class="panel-body" id="panel-ai">
+        <div>
+          <div class="panel-section-title">AI 생성 이미지</div>
+          <div class="panel-section-sub">클릭해서 배너 배경을 바꿔보세요</div>
+        </div>
+        <div class="ai-thumb-grid">
+          <div class="ai-thumb active" onclick="selectBg(this,'cbg1')">
+            <div class="ai-thumb-img at1"></div>
+            <div class="ai-thumb-label">웜 스틸라이프 #1</div>
+            <div class="active-badge">✓</div>
+          </div>
+          <div class="ai-thumb" onclick="selectBg(this,'cbg2')">
+            <div class="ai-thumb-img at2"></div>
+            <div class="ai-thumb-label">소프트 핑크 #2</div>
+            <div class="active-badge">✓</div>
+          </div>
+          <div class="ai-thumb" onclick="selectBg(this,'cbg3')">
+            <div class="ai-thumb-img at3"></div>
+            <div class="ai-thumb-label">내추럴 그린 #3</div>
+            <div class="active-badge">✓</div>
+          </div>
+          <div class="ai-thumb" onclick="selectBg(this,'cbg4')">
+            <div class="ai-thumb-img at4"></div>
+            <div class="ai-thumb-label">쿨 블루 #4</div>
+            <div class="active-badge">✓</div>
+          </div>
+          <div class="ai-thumb" onclick="selectBg(this,'cbg5')">
+            <div class="ai-thumb-img at5"></div>
+            <div class="ai-thumb-label">소프트 퍼플 #5</div>
+            <div class="active-badge">✓</div>
+          </div>
+          <div class="ai-thumb" onclick="selectBg(this,'cbg6')">
+            <div class="ai-thumb-img at6"></div>
+            <div class="ai-thumb-label">선샤인 옐로우 #6</div>
+            <div class="active-badge">✓</div>
+          </div>
+        </div>
+        <button class="goto-ai-btn" onclick="showScreen('ai')">
+          <svg width="13" height="13" fill="none" viewBox="0 0 24 24"><path d="M12 2l2.09 6.26L20 10l-5.91 1.74L12 18l-2.09-6.26L4 10l5.91-1.74L12 2z" fill="#7C5CFC"/></svg>
+          AI로 이미지 더 생성하기
+        </button>
+      </div>
+
+      <!-- 레이어 탭 -->
+      <div class="panel-body" id="panel-layer" style="display:none;">
+        <div class="layer-placeholder">레이어 패널</div>
+      </div>
+
+      <!-- 속성 탭 -->
+      <div class="panel-body" id="panel-props" style="display:none;">
+        <div class="layer-placeholder">속성 패널</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════ POPUP: 빌더 이동 확인 ══════════ -->
+<div class="popup-overlay hidden" id="popup" onclick="handleOverlay(event)">
+  <div class="popup-card">
+    <div class="popup-preview rb1" id="popupPreview">
+      <div class="popup-preview-inner">
+        <div class="banner-text-group">
+          <div class="bml1" style="width:100px;"></div>
+          <div class="bml2" style="width:72px;"></div>
+          <div class="bml3" style="width:52px;"></div>
+        </div>
+        <div class="banner-product-shape" style="width:64px; height:80px;"></div>
+      </div>
+    </div>
+    <div class="popup-body">
+      <div class="popup-icon">
+        <svg width="20" height="20" fill="none" viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7" stroke="#7C5CFC" stroke-width="2" stroke-linecap="round"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z" stroke="#7C5CFC" stroke-width="2" stroke-linecap="round"/></svg>
+      </div>
+      <div class="popup-title">빌더에서 편집할까요?</div>
+      <div class="popup-desc">선택한 배너가 빌더에 불러와져요.<br>텍스트, 로고, 버튼 등을 자유롭게 추가·수정할 수 있어요.</div>
+      <div class="popup-btns">
+        <button class="popup-cancel" onclick="closePopup()">취소</button>
+        <button class="popup-confirm" onclick="goToBuilder()">
+          <svg width="14" height="14" fill="none" viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          빌더로 이동
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Demo controls -->
+<div class="demo-controls">
+  <div class="demo-btns">
+    <button class="demo-btn active" id="btn-ai" onclick="showScreen('ai')">① AI 배너 생성</button>
+    <button class="demo-btn" id="btn-builder" onclick="showScreen('builder')">② 빌더</button>
+  </div>
+  <div class="demo-hint">배너에 마우스 올려 이동 팝업 확인</div>
+</div>
+
+<script>
+  /* ── Screen ── */
+  function showScreen(name) {
+    document.getElementById('screen-ai').style.display = name === 'ai' ? 'flex' : 'none';
+    document.getElementById('screen-builder').style.display = name === 'builder' ? 'flex' : 'none';
+    document.getElementById('btn-ai').classList.toggle('active', name === 'ai');
+    document.getElementById('btn-builder').classList.toggle('active', name === 'builder');
+  }
+
+  /* ── Popup ── */
+  let selectedBgClass = 'cbg1';
+  function openPopup(colorClass) {
+    selectedBgClass = colorClass.replace('rb', 'cbg');
+    document.getElementById('popupPreview').className = 'popup-preview ' + colorClass;
+    document.getElementById('popup').classList.remove('hidden');
+  }
+  function closePopup() {
+    document.getElementById('popup').classList.add('hidden');
+  }
+  function handleOverlay(e) {
+    if (e.target === document.getElementById('popup')) closePopup();
+  }
+  function goToBuilder() {
+    closePopup();
+    // Set builder canvas to selected banner
+    const bg = document.getElementById('canvasBg');
+    bg.className = 'canvas-bg ' + selectedBgClass;
+    // Sync AI thumb selection
+    document.querySelectorAll('.ai-thumb').forEach((t, i) => {
+      const match = t.getAttribute('onclick').includes(selectedBgClass);
+      t.classList.toggle('active', match);
+    });
+    showScreen('builder');
+  }
+
+  /* ── Builder: swap background ── */
+  function selectBg(thumb, bgClass) {
+    document.querySelectorAll('.ai-thumb').forEach(t => t.classList.remove('active'));
+    thumb.classList.add('active');
+    document.getElementById('canvasBg').className = 'canvas-bg ' + bgClass;
+  }
+
+  /* ── Builder: tab switch ── */
+  function switchTab(name, clickedTab) {
+    ['ai','layer','props'].forEach(t => {
+      document.getElementById('panel-' + t).style.display = t === name ? 'flex' : 'none';
+    });
+    document.querySelectorAll('.panel-tab').forEach(t => t.classList.remove('active'));
+    clickedTab.classList.add('active');
+  }
+
+  document.addEventListener('keydown', e => { if (e.key === 'Escape') closePopup(); });
+</script>
+</body>
+</html>

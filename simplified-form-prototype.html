@@ -1,0 +1,626 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=1980">
+  <title>AI 배너 생성 — 간소화 폼 프로토타입</title>
+  <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css" />
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    :root {
+      --gray-0:   #FFFFFF;
+      --gray-25:  #FAFBFC;
+      --gray-50:  #F4F6F8;
+      --gray-100: #EDF0F3;
+      --gray-150: #E3E7EC;
+      --gray-200: #D5DAE1;
+      --gray-300: #B8C0CC;
+      --gray-400: #8D97A5;
+      --gray-500: #6B7685;
+      --gray-600: #525C6A;
+      --gray-700: #3D4654;
+      --gray-800: #2A3040;
+      --gray-900: #1A1F2B;
+      --purple-50:  #F5F2FF;
+      --purple-100: #EBE5FF;
+      --purple-500: #7C5CFC;
+      --purple-600: #6644E5;
+      --purple-700: #5236BF;
+      --bg-app:             var(--gray-25);
+      --bg-surface:         var(--gray-0);
+      --bg-surface-secondary: var(--gray-50);
+      --bg-brand:           var(--purple-500);
+      --bg-brand-subtle:    var(--purple-50);
+      --text-primary:       var(--gray-800);
+      --text-secondary:     var(--gray-600);
+      --text-tertiary:      var(--gray-400);
+      --text-brand:         var(--purple-500);
+      --border-default:     var(--gray-150);
+      --shadow-subtle: 0px 4px 12px rgba(0,0,0,0.04);
+    }
+
+    body {
+      font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: var(--bg-app);
+      width: 1980px;
+      min-height: 1244px;
+      display: flex;
+      letter-spacing: -0.01em;
+      color: var(--text-primary);
+    }
+
+    /* ─── Sidebar ─── */
+    .sidebar {
+      width: 68px;
+      min-height: 1244px;
+      background: var(--gray-900);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 16px 0;
+      gap: 4px;
+      flex-shrink: 0;
+    }
+    .logo {
+      width: 36px; height: 36px;
+      background: var(--purple-500);
+      border-radius: 10px;
+      display: flex; align-items: center; justify-content: center;
+      color: white; font-size: 18px; font-weight: 700;
+      margin-bottom: 16px;
+    }
+    .nav-item {
+      width: 48px; height: 48px;
+      border-radius: 10px;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      gap: 3px; cursor: pointer;
+    }
+    .nav-item.active { background: rgba(124,92,252,0.15); }
+    .nav-item svg { opacity: 0.45; }
+    .nav-item.active svg { opacity: 1; }
+    .nav-label { font-size: 9px; font-weight: 500; color: var(--gray-400); }
+    .nav-item.active .nav-label { color: var(--purple-500); }
+
+    /* ─── Main ─── */
+    .main { flex: 1; display: flex; flex-direction: column; min-height: 1244px; }
+
+    .topbar {
+      height: 64px;
+      background: var(--bg-surface);
+      border-bottom: 1px solid var(--border-default);
+      padding: 0 28px;
+      display: flex; align-items: center; justify-content: space-between;
+      flex-shrink: 0;
+    }
+    .topbar-left { display: flex; align-items: center; gap: 12px; }
+    .topbar-title { font-size: 16px; font-weight: 600; color: var(--text-primary); letter-spacing: -0.02em; }
+    .credit-pill {
+      display: flex; align-items: center; gap: 5px;
+      background: var(--bg-surface-secondary);
+      border: 1px solid var(--border-default);
+      border-radius: 20px; padding: 4px 11px;
+      font-size: 12px; color: var(--text-secondary);
+    }
+    .credit-dot { width: 6px; height: 6px; background: var(--purple-500); border-radius: 50%; }
+
+    /* ─── Body split ─── */
+    .body-split { flex: 1; display: flex; }
+
+    /* ─── Left panel ─── */
+    .left-panel {
+      width: 520px;
+      flex-shrink: 0;
+      border-right: 1px solid var(--border-default);
+      background: var(--bg-surface);
+      display: flex;
+      flex-direction: column;
+      overflow-y: auto;
+    }
+
+    /* Form */
+    .form-wrap {
+      padding: 24px 24px 32px;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      flex: 1;
+    }
+    .section-label {
+      font-size: 13px; font-weight: 600;
+      color: var(--text-brand);
+      letter-spacing: -0.01em;
+      margin-bottom: 14px;
+    }
+    .field { display: flex; flex-direction: column; gap: 6px; }
+    .field-label {
+      font-size: 13px; font-weight: 500;
+      color: var(--text-primary); letter-spacing: -0.01em;
+    }
+    .field-input {
+      height: 44px;
+      border: 1px solid var(--border-default);
+      border-radius: 8px; padding: 0 14px;
+      font-size: 13px; color: var(--text-tertiary);
+      background: var(--bg-surface);
+      display: flex; align-items: center;
+      font-family: inherit;
+    }
+    .field-input:focus-within { border-color: var(--purple-500); outline: none; }
+
+    .upload-area {
+      border: 1px dashed var(--gray-200);
+      border-radius: 8px; padding: 14px;
+      display: flex; flex-direction: column; gap: 8px;
+    }
+    .upload-btn {
+      height: 38px;
+      background: var(--bg-surface-secondary);
+      border: 1px solid var(--border-default);
+      border-radius: 6px;
+      display: flex; align-items: center; justify-content: center;
+      gap: 6px; font-size: 13px; color: var(--text-secondary);
+      cursor: pointer;
+    }
+    .upload-hints { display: flex; flex-direction: column; gap: 3px; }
+    .upload-hint { font-size: 11px; color: var(--text-tertiary); letter-spacing: -0.01em; }
+
+    .style-row {
+      display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
+    }
+    .style-chip {
+      height: 34px;
+      background: var(--bg-surface-secondary);
+      border: 1px solid var(--border-default);
+      border-radius: 6px; padding: 0 14px;
+      font-size: 12px; font-weight: 500;
+      color: var(--text-primary); cursor: pointer;
+      display: flex; align-items: center;
+    }
+    .style-hint { font-size: 11px; color: var(--text-tertiary); margin-top: 6px; }
+
+    .select-box {
+      height: 44px;
+      border: 1px solid var(--border-default);
+      border-radius: 8px; padding: 0 14px;
+      display: flex; align-items: center; justify-content: space-between;
+      font-size: 13px; color: var(--text-primary);
+    }
+    .textarea-box {
+      border: 1px solid var(--border-default);
+      border-radius: 8px; padding: 12px 14px;
+      font-size: 13px; color: var(--text-tertiary);
+      min-height: 80px; resize: none;
+      font-family: inherit; width: 100%;
+      outline: none;
+    }
+    .char-count {
+      font-size: 11px; color: var(--text-tertiary);
+      text-align: right; margin-top: 4px;
+    }
+
+    .generate-btn {
+      height: 52px;
+      background: var(--bg-brand);
+      border: none; border-radius: 10px;
+      font-size: 15px; font-weight: 700;
+      color: white; cursor: pointer;
+      font-family: inherit; letter-spacing: -0.02em;
+      display: flex; align-items: center; justify-content: center; gap: 8px;
+      box-shadow: 0 4px 16px rgba(124,92,252,0.3);
+      margin-top: 4px;
+      transition: background 0.15s;
+    }
+    .generate-btn:hover { background: var(--purple-600); }
+    .generate-btn.disabled {
+      background: var(--gray-100);
+      color: var(--text-tertiary);
+      box-shadow: none;
+      cursor: not-allowed;
+    }
+
+    /* ─── Right panel ─── */
+    .right-panel {
+      flex: 1;
+      padding: 24px 28px;
+      display: flex; flex-direction: column; gap: 16px;
+    }
+
+    .preview-tabs {
+      display: flex;
+      border: 1px solid var(--border-default);
+      border-radius: 8px; overflow: hidden;
+    }
+    .preview-tab {
+      flex: 1; height: 40px;
+      display: flex; align-items: center; justify-content: center;
+      gap: 6px; font-size: 13px; font-weight: 500; cursor: pointer;
+    }
+    .preview-tab.active { background: var(--purple-50); color: var(--text-brand); }
+    .preview-tab:not(.active) { color: var(--text-tertiary); }
+
+    .showcase-header { display: flex; flex-direction: column; gap: 2px; }
+    .showcase-title { font-size: 15px; font-weight: 600; color: var(--text-primary); letter-spacing: -0.02em; }
+    .showcase-sub { font-size: 12px; color: var(--text-tertiary); letter-spacing: -0.01em; }
+
+    .showcase-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      flex: 1;
+    }
+    .sc-card {
+      border-radius: 12px; overflow: hidden;
+      border: 1px solid var(--border-default);
+    }
+    .sc-img {
+      height: 148px; position: relative;
+    }
+    /* 예시 배너 스타일 */
+    .sc1 { background: linear-gradient(135deg, #f8f0ff 0%, #e8d5ff 100%); }
+    .sc2 { background: linear-gradient(135deg, #fef9f0 0%, #fde8c0 100%); }
+    .sc3 { background: linear-gradient(135deg, #f0fff4 0%, #c6f6d5 100%); }
+    .sc4 { background: linear-gradient(135deg, #f0f9ff 0%, #bae6fd 100%); }
+
+    .sc-product {
+      position: absolute; border-radius: 10px;
+      box-shadow: 0 6px 20px rgba(0,0,0,0.13);
+      right: 24px; top: 50%; transform: translateY(-50%);
+    }
+    .sc1 .sc-product { width: 64px; height: 76px; background: linear-gradient(160deg,#c084fc,#a855f7); }
+    .sc2 .sc-product { width: 68px; height: 68px; background: linear-gradient(160deg,#fbbf24,#f59e0b); border-radius: 50%; }
+    .sc3 .sc-product { width: 60px; height: 72px; background: linear-gradient(160deg,#34d399,#10b981); }
+    .sc4 .sc-product { width: 64px; height: 76px; background: linear-gradient(160deg,#38bdf8,#0ea5e9); }
+
+    .sc-texts { position: absolute; left: 18px; bottom: 18px; }
+    .sc-line1 { height: 9px; border-radius: 5px; margin-bottom: 5px; opacity: 0.8; }
+    .sc-line2 { height: 6px; border-radius: 4px; opacity: 0.5; }
+    .sc1 .sc-line1 { width: 80px; background: #7c3aed; }
+    .sc1 .sc-line2 { width: 56px; background: #a78bfa; }
+    .sc2 .sc-line1 { width: 88px; background: #92400e; }
+    .sc2 .sc-line2 { width: 60px; background: #b45309; }
+    .sc3 .sc-line1 { width: 76px; background: #065f46; }
+    .sc3 .sc-line2 { width: 52px; background: #047857; }
+    .sc4 .sc-line1 { width: 80px; background: #0369a1; }
+    .sc4 .sc-line2 { width: 56px; background: #0284c7; }
+
+    .sc-foot {
+      padding: 9px 13px;
+      border-top: 1px solid var(--border-default);
+      display: flex; align-items: center; justify-content: space-between;
+      background: var(--bg-surface);
+    }
+    .sc-foot-label { font-size: 11px; font-weight: 500; color: var(--text-secondary); }
+    .sc-foot-cat   { font-size: 11px; color: var(--text-tertiary); }
+
+    .info-strip {
+      background: var(--bg-brand-subtle);
+      border-radius: 10px; padding: 14px 18px;
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .info-strip-text { }
+    .info-strip-title {
+      font-size: 13px; font-weight: 600;
+      color: var(--text-brand); letter-spacing: -0.02em;
+    }
+    .info-strip-sub {
+      font-size: 11px; color: var(--purple-500);
+      opacity: 0.75; margin-top: 2px;
+    }
+
+    /* ─── Comparison toggle ─── */
+    .compare-toggle {
+      position: fixed;
+      bottom: 32px; right: 32px;
+      display: flex; gap: 8px;
+      z-index: 10;
+    }
+    .toggle-btn {
+      height: 38px; padding: 0 16px;
+      border-radius: 20px; border: none;
+      font-size: 12px; font-weight: 600;
+      cursor: pointer; font-family: inherit;
+      letter-spacing: -0.01em; transition: all 0.15s;
+    }
+    .toggle-btn.active {
+      background: var(--gray-900); color: white;
+    }
+    .toggle-btn:not(.active) {
+      background: var(--bg-surface);
+      color: var(--text-secondary);
+      border: 1px solid var(--border-default);
+    }
+    .compare-label {
+      font-size: 11px; color: var(--text-tertiary);
+      text-align: center; margin-top: 6px;
+    }
+
+    /* ─── Before state (original) ─── */
+    .before-state .purpose-section { display: flex; }
+    .before-state .form-divider { display: block; }
+    .before-state .right-panel .showcase-header { display: none; }
+    .before-state .right-panel .showcase-grid { display: none; }
+    .before-state .right-panel .info-strip { display: none; }
+    .before-state .right-panel .preview-empty { display: flex; }
+
+    /* ─── After state (proposed) ─── */
+    .after-state .purpose-section { display: none; }
+    .after-state .form-divider { display: none; }
+    .after-state .right-panel .preview-empty { display: none; }
+
+    /* purpose section (before only) */
+    .purpose-section {
+      display: flex; flex-direction: column; gap: 12px;
+    }
+    .purpose-cards {
+      display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px;
+    }
+    .purpose-card {
+      border: 2px solid var(--border-default);
+      border-radius: 12px; overflow: hidden;
+      background: var(--bg-surface);
+    }
+    .purpose-card.sel { border-color: var(--purple-500); background: var(--purple-50); }
+    .purpose-card-top { padding: 10px 12px 6px; }
+    .pc-title { font-size: 12px; font-weight: 600; color: var(--text-primary); letter-spacing: -0.02em; }
+    .pc-desc  { font-size: 10px; color: var(--text-tertiary); margin-top: 2px; line-height: 1.4; }
+    .purpose-card-img { height: 72px; margin: 6px 8px 8px; border-radius: 8px; }
+    .g1 { background: linear-gradient(135deg, #f5e6c8, #e8c47a); }
+    .g2 { background: linear-gradient(135deg, #ffd6e0, #ffb3c6); }
+    .g3 { background: linear-gradient(135deg, #2a2a2a, #1a1a1a); }
+    .form-divider { height: 1px; background: var(--border-default); margin: 0; }
+
+    /* preview empty (before) */
+    .preview-empty {
+      flex: 1;
+      display: none;
+      flex-direction: column;
+      align-items: center; justify-content: center;
+      gap: 8px;
+      background: var(--bg-surface);
+      border: 1px solid var(--border-default);
+      border-radius: 12px;
+    }
+    .preview-empty-title {
+      font-size: 18px; font-weight: 600;
+      color: var(--text-primary); letter-spacing: -0.02em; text-align: center;
+    }
+    .preview-empty-desc {
+      font-size: 13px; color: var(--text-tertiary); text-align: center; line-height: 1.6;
+    }
+
+    /* badge */
+    .state-badge {
+      position: fixed; top: 20px; left: 50%;
+      transform: translateX(-50%);
+      padding: 6px 18px; border-radius: 20px;
+      font-size: 12px; font-weight: 700;
+      letter-spacing: -0.01em; z-index: 20;
+      pointer-events: none;
+      transition: all 0.2s;
+    }
+    .state-badge.before { background: #fee2e2; color: #991b1b; }
+    .state-badge.after  { background: #dcfce7; color: #166534; }
+  </style>
+</head>
+<body class="after-state" id="root">
+
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <div class="logo">α</div>
+    <div class="nav-item">
+      <svg width="20" height="20" fill="none" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1" fill="white"/><rect x="14" y="3" width="7" height="7" rx="1" fill="white"/><rect x="3" y="14" width="7" height="7" rx="1" fill="white"/><rect x="14" y="14" width="7" height="7" rx="1" fill="white"/></svg>
+      <span class="nav-label">홈</span>
+    </div>
+    <div class="nav-item active">
+      <svg width="20" height="20" fill="none" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2" stroke="#7C5CFC" stroke-width="1.8"/><path d="M8 12h8M12 8v8" stroke="#7C5CFC" stroke-width="1.8" stroke-linecap="round"/></svg>
+      <span class="nav-label">스튜디오</span>
+    </div>
+    <div class="nav-item">
+      <svg width="20" height="20" fill="none" viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h10" stroke="white" stroke-width="1.8" stroke-linecap="round"/></svg>
+      <span class="nav-label">배너</span>
+    </div>
+    <div class="nav-item">
+      <svg width="20" height="20" fill="none" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" stroke="white" stroke-width="1.8"/><path d="M12 8v4l3 3" stroke="white" stroke-width="1.8" stroke-linecap="round"/></svg>
+      <span class="nav-label">설정</span>
+    </div>
+  </aside>
+
+  <!-- Main -->
+  <main class="main">
+    <div class="topbar">
+      <div class="topbar-left">
+        <span class="topbar-title">AI 배너 생성</span>
+        <div class="credit-pill">
+          <div class="credit-dot"></div>
+          남은 AI 배너 생성 수 4/10
+          <svg width="12" height="12" fill="none" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" stroke="#8D97A5" stroke-width="1.8"/><path d="M12 11v5M12 8v1" stroke="#8D97A5" stroke-width="1.8" stroke-linecap="round"/></svg>
+        </div>
+      </div>
+    </div>
+
+    <div class="body-split">
+      <!-- ─── Left panel ─── -->
+      <div class="left-panel">
+
+        <!-- 혜택 에셋 링크는 generate-btn 아래에 위치 -->
+
+        <!-- 배너 목적 (Before only) -->
+        <div class="purpose-section" style="padding: 24px 24px 0;">
+          <div class="section-label" style="margin-bottom:0;">배너 목적
+            <span style="float:right; font-size:11px; font-weight:400; color:var(--text-tertiary);">예시 이미지</span>
+          </div>
+          <div class="purpose-cards">
+            <div class="purpose-card sel">
+              <div class="purpose-card-top"><div class="pc-title">제품 / 카테고리</div><div class="pc-desc">브랜드·카테고리별 상품 한눈에 보기</div></div>
+              <div class="purpose-card-img g1"></div>
+            </div>
+            <div class="purpose-card">
+              <div class="purpose-card-top"><div class="pc-title">기획전 / 프로모션</div><div class="pc-desc">할인, 시즌오프 등 한시적 이벤트</div></div>
+              <div class="purpose-card-img g2"></div>
+            </div>
+            <div class="purpose-card">
+              <div class="purpose-card-top"><div class="pc-title">일반 혜택 홍보</div><div class="pc-desc">회원 전용 혜택부터 쿠폰까지</div></div>
+              <div class="purpose-card-img g3"></div>
+            </div>
+          </div>
+        </div>
+        <div class="form-divider" style="margin: 20px 24px 0;"></div>
+
+        <!-- Form -->
+        <div class="form-wrap">
+          <div>
+            <div class="section-label">제품 정보 입력</div>
+            <div style="display:flex; flex-direction:column; gap:16px;">
+
+              <div class="field">
+                <div class="field-label">제품명</div>
+                <div class="field-input" style="color:var(--text-tertiary);">
+                  예 : 알파캔버스 수분 크림, 알파캔버스 원피스
+                </div>
+              </div>
+
+              <div class="field">
+                <div class="field-label">이미지</div>
+                <div class="upload-area">
+                  <div class="upload-btn">
+                    <svg width="14" height="14" fill="none" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3" stroke="#525C6A" stroke-width="1.8"/><path d="M3 9l3-3h3l2-2h2l2 2h3l3 3v9a1 1 0 01-1 1H4a1 1 0 01-1-1V9z" stroke="#525C6A" stroke-width="1.8"/></svg>
+                    이미지 업로드
+                  </div>
+                  <div class="upload-hints">
+                    <div class="upload-hint">· 배경이 단순하고 선명한 사진을 권장해요</div>
+                    <div class="upload-hint">· 스마트폰 촬영 수준이면 충분해요</div>
+                    <div class="upload-hint">· 최대 4장까지 올릴 수 있어요. (장당 10MB 이하)</div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="field">
+                <div class="field-label">참고 스타일 선택</div>
+                <div class="style-row">
+                  <div class="style-chip">스타일 선택</div>
+                </div>
+                <div class="style-hint">· 원하는 스타일을 최대한 참고하여 생성해드려요</div>
+              </div>
+
+              <div class="field">
+                <div class="field-label">이미지 생성 개수</div>
+                <div class="select-box">
+                  <span>3장</span>
+                  <svg width="14" height="14" fill="none" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6" stroke="#525C6A" stroke-width="1.8" stroke-linecap="round"/></svg>
+                </div>
+              </div>
+
+              <div class="field">
+                <div class="field-label">추가 요청사항</div>
+                <textarea class="textarea-box" placeholder="예 : 따뜻하고 봄 느낌으로, 파스텔 톤 배경 원해요" maxlength="180"></textarea>
+                <div class="char-count">0 / 180</div>
+              </div>
+
+            </div>
+          </div>
+
+          <button class="generate-btn disabled">AI 배너 생성하기</button>
+
+        </div>
+      </div>
+
+      <!-- ─── Right panel ─── -->
+      <div class="right-panel">
+        <div class="preview-tabs">
+          <div class="preview-tab active">
+            <svg width="13" height="13" fill="none" viewBox="0 0 24 24"><rect x="2" y="4" width="20" height="16" rx="2" stroke="#6644E5" stroke-width="1.8"/></svg>
+            데스크탑
+          </div>
+          <div class="preview-tab">
+            <svg width="13" height="13" fill="none" viewBox="0 0 24 24"><rect x="7" y="2" width="10" height="20" rx="2" stroke="#8D97A5" stroke-width="1.8"/></svg>
+            모바일
+          </div>
+        </div>
+
+        <!-- Before: empty state -->
+        <div class="preview-empty">
+          <div class="preview-empty-title">가장 먼저 왼쪽 항목을<br>작성해보세요</div>
+          <div class="preview-empty-desc">왼쪽 항목을 작성하고<br>AI 배너 생성하기를 눌러주세요</div>
+        </div>
+
+        <!-- After: showcase -->
+        <div class="showcase-header">
+          <div class="showcase-title">이런 배너가 만들어져요</div>
+          <div class="showcase-sub">왼쪽 정보를 입력하면 내 제품 맞춤으로 생성돼요</div>
+        </div>
+
+        <div class="showcase-grid">
+          <div class="sc-card">
+            <div class="sc-img sc1">
+              <div class="sc-product"></div>
+              <div class="sc-texts"><div class="sc-line1"></div><div class="sc-line2"></div></div>
+            </div>
+            <div class="sc-foot"><span class="sc-foot-label">클린 플로팅</span><span class="sc-foot-cat">뷰티</span></div>
+          </div>
+          <div class="sc-card">
+            <div class="sc-img sc2">
+              <div class="sc-product"></div>
+              <div class="sc-texts"><div class="sc-line1"></div><div class="sc-line2"></div></div>
+            </div>
+            <div class="sc-foot"><span class="sc-foot-label">프리미엄 스틸라이프</span><span class="sc-foot-cat">식품</span></div>
+          </div>
+          <div class="sc-card">
+            <div class="sc-img sc3">
+              <div class="sc-product"></div>
+              <div class="sc-texts"><div class="sc-line1"></div><div class="sc-line2"></div></div>
+            </div>
+            <div class="sc-foot"><span class="sc-foot-label">클린 플로팅</span><span class="sc-foot-cat">리빙</span></div>
+          </div>
+          <div class="sc-card">
+            <div class="sc-img sc4">
+              <div class="sc-product"></div>
+              <div class="sc-texts"><div class="sc-line1"></div><div class="sc-line2"></div></div>
+            </div>
+            <div class="sc-foot"><span class="sc-foot-label">라인업 쇼케이스</span><span class="sc-foot-cat">리빙</span></div>
+          </div>
+        </div>
+
+        <div class="info-strip">
+          <div class="info-strip-text">
+            <div class="info-strip-title">왼쪽 정보를 입력하고 생성해보세요</div>
+            <div class="info-strip-sub">배너 3장 완성까지 약 2~3분 · PC·모바일 세트 제공</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- 상태 뱃지 -->
+  <div class="state-badge after" id="stateBadge">✅ 개선안</div>
+
+  <!-- 비교 토글 -->
+  <div style="position:fixed; bottom:32px; right:32px; z-index:10; display:flex; flex-direction:column; align-items:center; gap:6px;">
+    <div style="display:flex; gap:8px;">
+      <button class="toggle-btn" id="btnBefore" onclick="showBefore()">현재</button>
+      <button class="toggle-btn active" id="btnAfter" onclick="showAfter()">개선안</button>
+    </div>
+    <div class="compare-label">클릭해서 비교해보세요</div>
+  </div>
+
+  <script>
+    /* ── 상태 비교 토글 ── */
+    function showBefore() {
+      document.getElementById('root').className = 'before-state';
+      document.getElementById('stateBadge').className = 'state-badge before';
+      document.getElementById('stateBadge').textContent = '⬅ 현재';
+      document.getElementById('btnBefore').classList.add('active');
+      document.getElementById('btnAfter').classList.remove('active');
+    }
+    function showAfter() {
+      document.getElementById('root').className = 'after-state';
+      document.getElementById('stateBadge').className = 'state-badge after';
+      document.getElementById('stateBadge').textContent = '✅ 개선안';
+      document.getElementById('btnBefore').classList.remove('active');
+      document.getElementById('btnAfter').classList.add('active');
+    }
+
+  </script>
+</body>
+</html>

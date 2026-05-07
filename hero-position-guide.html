@@ -1,0 +1,655 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<title>히어로 배너 위치 가이드 — 우측 패널</title>
+<link href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css" rel="stylesheet">
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Pretendard', sans-serif;
+    background: #F3F4F6;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    padding: 40px 24px;
+    min-height: 100vh;
+  }
+
+  .page {
+    width: 1040px;
+    display: flex;
+    gap: 16px;
+    align-items: flex-start;
+  }
+
+  /* ── 좌측 폼 ── */
+  .left {
+    width: 460px;
+    flex-shrink: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .page-title {
+    font-size: 20px;
+    font-weight: 700;
+    color: #111827;
+    padding-bottom: 4px;
+  }
+
+  .onboarding-banner {
+    background: #FAF7FF;
+    border: 1px solid #EDE9FE;
+    border-radius: 10px;
+    padding: 14px 16px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    position: relative;
+  }
+  .onboarding-banner .ob-text { flex: 1; }
+  .ob-title { font-size: 14px; font-weight: 700; color: #1F2937; margin-bottom: 2px; }
+  .ob-sub { font-size: 12px; color: #6B7280; }
+  .ob-illus {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex-shrink: 0;
+  }
+  .ob-img {
+    width: 36px; height: 36px;
+    background: #E5E7EB;
+    border-radius: 6px;
+  }
+  .ob-arrow {
+    font-size: 14px; color: #A78BFA;
+    background: #EDE9FE;
+    padding: 2px 6px;
+    border-radius: 6px;
+    font-weight: 700;
+  }
+  .ob-img-after {
+    width: 56px; height: 36px;
+    background: linear-gradient(135deg, #C4B5FD, #A78BFA);
+    border-radius: 6px;
+  }
+  .ob-close {
+    position: absolute; top: 10px; right: 12px;
+    font-size: 14px; color: #9CA3AF; cursor: pointer;
+    background: none; border: none;
+  }
+
+  .form-card {
+    background: #fff;
+    border: 1px solid #E5E7EB;
+    border-radius: 12px;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
+
+  .form-section-title {
+    font-size: 13px;
+    font-weight: 600;
+    color: #6D28D9;
+    margin-bottom: -10px;
+  }
+
+  .form-row { display: flex; flex-direction: column; gap: 6px; }
+  .form-label { font-size: 13px; font-weight: 500; color: #374151; }
+
+  .form-input {
+    height: 40px;
+    border: 1px solid #E5E7EB;
+    border-radius: 8px;
+    padding: 0 12px;
+    font-size: 13px;
+    color: #9CA3AF;
+    font-family: inherit;
+    display: flex;
+    align-items: center;
+  }
+
+  .upload-area {
+    border: 1.5px dashed #D1D5DB;
+    border-radius: 8px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    font-size: 12px;
+    color: #6B7280;
+    cursor: pointer;
+  }
+
+  .style-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 6px 12px;
+    border: 1px solid #7C3AED;
+    border-radius: 6px;
+    font-size: 12px;
+    font-weight: 500;
+    color: #7C3AED;
+    background: #fff;
+    cursor: pointer;
+  }
+
+  .form-select {
+    height: 40px;
+    border: 1px solid #E5E7EB;
+    border-radius: 8px;
+    padding: 0 12px;
+    font-size: 13px;
+    color: #374151;
+    font-family: inherit;
+    background: #fff;
+  }
+
+  .submit-btn {
+    width: 100%;
+    height: 48px;
+    background: #5EEAD4;
+    border: none;
+    border-radius: 10px;
+    font-size: 15px;
+    font-weight: 700;
+    color: #fff;
+    cursor: pointer;
+    letter-spacing: -0.01em;
+  }
+
+  /* ── 우측 패널 ── */
+  .right {
+    flex: 1;
+    background: #fff;
+    border: 1px solid #E5E7EB;
+    border-radius: 14px;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .right-header {
+    padding: 16px 20px 12px;
+    border-bottom: 1px solid #F3F4F6;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .device-tabs {
+    display: flex;
+    border: 1px solid #E5E7EB;
+    border-radius: 8px;
+    overflow: hidden;
+  }
+  .dtab {
+    padding: 6px 16px;
+    font-size: 12px;
+    font-weight: 500;
+    color: #6B7280;
+    cursor: pointer;
+    background: #fff;
+    border: none;
+    font-family: inherit;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+  .dtab.active {
+    background: #7C3AED;
+    color: #fff;
+  }
+
+  .right-body {
+    padding: 20px;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 16px;
+  }
+
+  /* ── 쇼핑몰 미니 프레임 ── */
+  .store-frame {
+    width: 100%;
+    border: 1.5px solid #E5E7EB;
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+  }
+
+  /* 브라우저 크롬 */
+  .browser-chrome {
+    background: #F9FAFB;
+    border-bottom: 1px solid #E5E7EB;
+    padding: 8px 12px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .chrome-dots {
+    display: flex;
+    gap: 4px;
+  }
+  .dot {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+  }
+  .dot.red { background: #FCA5A5; }
+  .dot.yellow { background: #FCD34D; }
+  .dot.green { background: #6EE7B7; }
+  .chrome-bar {
+    flex: 1;
+    height: 20px;
+    background: #F3F4F6;
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    padding: 0 8px;
+  }
+  .chrome-url {
+    font-size: 10px;
+    color: #9CA3AF;
+  }
+
+  /* 쇼핑몰 내부 */
+  .store-inner { background: #fff; }
+
+  /* GNB */
+  .store-gnb {
+    height: 36px;
+    background: #fff;
+    border-bottom: 1px solid #F3F4F6;
+    display: flex;
+    align-items: center;
+    padding: 0 16px;
+    gap: 12px;
+    opacity: 0.35;
+  }
+  .gnb-logo {
+    width: 48px; height: 12px;
+    background: #D1D5DB;
+    border-radius: 3px;
+  }
+  .gnb-links {
+    display: flex;
+    gap: 8px;
+    margin-left: 8px;
+  }
+  .gnb-link {
+    width: 28px; height: 8px;
+    background: #E5E7EB;
+    border-radius: 2px;
+  }
+  .gnb-right {
+    margin-left: auto;
+    display: flex;
+    gap: 6px;
+  }
+  .gnb-icon {
+    width: 14px; height: 14px;
+    background: #E5E7EB;
+    border-radius: 50%;
+  }
+
+  /* 히어로 배너 영역 — 핵심 */
+  .hero-zone {
+    position: relative;
+    height: 140px;
+    background: #F5F3FF;
+    border: 2px dashed #A78BFA;
+    margin: 8px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    gap: 6px;
+    cursor: default;
+    transition: background 0.3s;
+  }
+  .hero-zone.filled {
+    background: linear-gradient(120deg, #C4B5FD 0%, #818CF8 50%, #6D28D9 100%);
+    border: 2px solid transparent;
+  }
+  .hero-zone.filled .hero-placeholder { display: none; }
+  .hero-zone.filled .hero-filled { display: flex; }
+
+  .hero-placeholder {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+  }
+  .hero-icon {
+    width: 32px; height: 32px;
+    background: #EDE9FE;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+  }
+  .hero-label {
+    font-size: 11px;
+    font-weight: 700;
+    color: #7C3AED;
+  }
+  .hero-sub {
+    font-size: 10px;
+    color: #A78BFA;
+  }
+
+  .hero-filled {
+    display: none;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 100%;
+    flex-direction: column;
+    gap: 4px;
+  }
+  .hero-filled-text {
+    font-size: 13px;
+    font-weight: 700;
+    color: #fff;
+    text-shadow: 0 1px 4px rgba(0,0,0,0.2);
+  }
+  .hero-filled-sub {
+    font-size: 10px;
+    color: rgba(255,255,255,0.75);
+  }
+
+  /* 배지 */
+  .hero-badge {
+    position: absolute;
+    top: -10px;
+    left: 12px;
+    background: #7C3AED;
+    color: #fff;
+    font-size: 10px;
+    font-weight: 700;
+    padding: 2px 8px;
+    border-radius: 20px;
+    letter-spacing: 0.02em;
+    display: flex;
+    align-items: center;
+    gap: 3px;
+  }
+
+  /* 화살표 라벨 */
+  .hero-arrow {
+    position: absolute;
+    right: -1px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: #7C3AED;
+    color: #fff;
+    font-size: 10px;
+    font-weight: 600;
+    padding: 4px 8px 4px 10px;
+    border-radius: 4px 0 0 4px;
+    white-space: nowrap;
+    display: flex;
+    align-items: center;
+    gap: 3px;
+  }
+  .hero-arrow::before {
+    content: '←';
+    font-size: 10px;
+  }
+
+  /* 상품 그리드 영역 */
+  .store-products {
+    padding: 10px 12px 12px;
+    opacity: 0.25;
+  }
+  .products-label {
+    width: 60px; height: 8px;
+    background: #D1D5DB;
+    border-radius: 2px;
+    margin-bottom: 8px;
+  }
+  .products-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 6px;
+  }
+  .product-card {
+    border-radius: 4px;
+    overflow: hidden;
+  }
+  .product-img {
+    height: 44px;
+    background: #E5E7EB;
+    border-radius: 3px;
+    margin-bottom: 4px;
+  }
+  .product-name {
+    height: 6px;
+    background: #E5E7EB;
+    border-radius: 2px;
+    margin-bottom: 3px;
+  }
+  .product-price {
+    height: 6px;
+    background: #D1D5DB;
+    border-radius: 2px;
+    width: 60%;
+  }
+
+  /* 설명 텍스트 */
+  .guide-text {
+    font-size: 12px;
+    color: #6B7280;
+    text-align: center;
+    line-height: 1.6;
+  }
+  .guide-text strong { color: #374151; font-weight: 600; }
+
+  /* 상태 토글 버튼 */
+  .toggle-row {
+    display: flex;
+    gap: 8px;
+    width: 100%;
+  }
+  .toggle-btn {
+    flex: 1;
+    height: 34px;
+    border-radius: 8px;
+    border: 1px solid #E5E7EB;
+    background: #fff;
+    font-size: 12px;
+    font-weight: 500;
+    color: #6B7280;
+    cursor: pointer;
+    font-family: inherit;
+    transition: all 0.15s;
+  }
+  .toggle-btn.active {
+    background: #F3F0FF;
+    border-color: #A78BFA;
+    color: #6D28D9;
+    font-weight: 600;
+  }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <!-- 좌측 폼 -->
+  <div class="left">
+    <div class="page-title">AI 배너 생성</div>
+
+    <!-- 온보딩 배너 -->
+    <div class="onboarding-banner">
+      <div class="ob-text">
+        <div class="ob-title">제품 이미지를 AI가 배너로 만들어드려요</div>
+        <div class="ob-sub">원하는 스타일을 선택하고, 바로 생성해보세요</div>
+      </div>
+      <div class="ob-illus">
+        <div class="ob-img"></div>
+        <span class="ob-arrow">AI ✦</span>
+        <div class="ob-img-after"></div>
+      </div>
+      <button class="ob-close">✕</button>
+    </div>
+
+    <!-- 폼 -->
+    <div class="form-card">
+      <div class="form-section-title">제품 정보 입력</div>
+
+      <div class="form-row">
+        <div class="form-label">제품명</div>
+        <div class="form-input" style="color:#9CA3AF">예 : 알파캔버스 수분 크림, 알파캔버스 원피스</div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-label">이미지</div>
+        <div class="upload-area">📷 이미지 업로드</div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-label">참고 스타일 선택</div>
+        <div><button class="style-btn">🎨 스타일 선택</button></div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-label">이미지 생성 개수</div>
+        <select class="form-select"><option>3장</option></select>
+      </div>
+
+      <button class="submit-btn">AI 배너 생성하기</button>
+    </div>
+  </div>
+
+  <!-- 우측 패널 -->
+  <div class="right">
+    <div class="right-header">
+      <div class="device-tabs">
+        <button class="dtab active">🖥 데스크탑</button>
+        <button class="dtab">📱 모바일</button>
+      </div>
+    </div>
+
+    <div class="right-body">
+      <!-- 상태 토글 -->
+      <div class="toggle-row">
+        <button class="toggle-btn active" onclick="setState('before', this)">생성 전</button>
+        <button class="toggle-btn" onclick="setState('after', this)">생성 후</button>
+      </div>
+
+      <!-- 쇼핑몰 미니 프레임 -->
+      <div class="store-frame">
+        <!-- 브라우저 크롬 -->
+        <div class="browser-chrome">
+          <div class="chrome-dots">
+            <div class="dot red"></div>
+            <div class="dot yellow"></div>
+            <div class="dot green"></div>
+          </div>
+          <div class="chrome-bar">
+            <span class="chrome-url">myshop.alphacms.co.kr</span>
+          </div>
+        </div>
+
+        <div class="store-inner">
+          <!-- GNB -->
+          <div class="store-gnb">
+            <div class="gnb-logo"></div>
+            <div class="gnb-links">
+              <div class="gnb-link"></div>
+              <div class="gnb-link"></div>
+              <div class="gnb-link"></div>
+            </div>
+            <div class="gnb-right">
+              <div class="gnb-icon"></div>
+              <div class="gnb-icon"></div>
+            </div>
+          </div>
+
+          <!-- 히어로 배너 -->
+          <div class="hero-zone" id="heroZone">
+            <div class="hero-badge">✦ AI 배너</div>
+
+            <!-- Before -->
+            <div class="hero-placeholder">
+              <div class="hero-icon">🖼</div>
+              <div class="hero-label">히어로 배너가 여기에 들어가요</div>
+              <div class="hero-sub">쇼핑몰 메인 최상단 영역</div>
+            </div>
+
+            <!-- After -->
+            <div class="hero-filled">
+              <div class="hero-filled-text">알파캔버스 수분 크림</div>
+              <div class="hero-filled-sub">AI가 생성한 배너 · 지금 바로 적용 가능해요</div>
+            </div>
+
+            <div class="hero-arrow">이 자리에 적용</div>
+          </div>
+
+          <!-- 상품 그리드 -->
+          <div class="store-products">
+            <div class="products-label"></div>
+            <div class="products-grid">
+              <div class="product-card">
+                <div class="product-img"></div>
+                <div class="product-name"></div>
+                <div class="product-price"></div>
+              </div>
+              <div class="product-card">
+                <div class="product-img"></div>
+                <div class="product-name"></div>
+                <div class="product-price"></div>
+              </div>
+              <div class="product-card">
+                <div class="product-img"></div>
+                <div class="product-name"></div>
+                <div class="product-price"></div>
+              </div>
+              <div class="product-card">
+                <div class="product-img"></div>
+                <div class="product-name"></div>
+                <div class="product-price"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 안내 텍스트 -->
+      <p class="guide-text" id="guideText">
+        생성된 배너는 <strong>쇼핑몰 메인 페이지 최상단</strong>에 적용돼요.<br>
+        왼쪽에서 정보를 입력하고 생성을 시작해보세요.
+      </p>
+    </div>
+  </div>
+</div>
+
+<script>
+  function setState(state, btn) {
+    document.querySelectorAll('.toggle-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+
+    const zone = document.getElementById('heroZone');
+    const text = document.getElementById('guideText');
+
+    if (state === 'after') {
+      zone.classList.add('filled');
+      text.innerHTML = '배너가 생성됐어요! <strong>웹빌더에서 편집</strong>하거나 바로 <strong>적용</strong>할 수 있어요.';
+    } else {
+      zone.classList.remove('filled');
+      text.innerHTML = '생성된 배너는 <strong>쇼핑몰 메인 페이지 최상단</strong>에 적용돼요.<br>왼쪽에서 정보를 입력하고 생성을 시작해보세요.';
+    }
+  }
+</script>
+</body>
+</html>

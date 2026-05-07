@@ -1,0 +1,678 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=1980">
+  <title>콘텐츠 스튜디오 — 진입경로</title>
+  <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css" />
+  <script src="https://mcp.figma.com/mcp/html-to-design/capture.js" async></script>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    :root {
+      /* Gray */
+      --gray-0:   #FFFFFF;
+      --gray-25:  #FAFBFC;
+      --gray-50:  #F4F6F8;
+      --gray-100: #EDF0F3;
+      --gray-150: #E3E7EC;
+      --gray-200: #D5DAE1;
+      --gray-300: #B8C0CC;
+      --gray-400: #8D97A5;
+      --gray-500: #6B7685;
+      --gray-600: #525C6A;
+      --gray-700: #3D4654;
+      --gray-800: #2A3040;
+      --gray-900: #1A1F2B;
+      /* Purple */
+      --purple-50:  #F5F2FF;
+      --purple-100: #EBE5FF;
+      --purple-200: #D4C8FF;
+      --purple-500: #7C5CFC;
+      --purple-600: #6644E5;
+      --purple-700: #5236BF;
+      /* Semantic */
+      --bg-app:             var(--gray-25);
+      --bg-surface:         var(--gray-0);
+      --bg-surface-secondary: var(--gray-50);
+      --bg-brand:           var(--purple-500);
+      --bg-brand-subtle:    var(--purple-50);
+      --text-primary:       var(--gray-800);
+      --text-secondary:     var(--gray-600);
+      --text-tertiary:      var(--gray-400);
+      --text-brand:         var(--purple-500);
+      --border-default:     var(--gray-150);
+      --border-strong:      var(--gray-200);
+      --border-brand:       var(--purple-500);
+      --icon-primary:       var(--gray-700);
+      --icon-secondary:     var(--gray-500);
+      /* Shadow */
+      --shadow-subtle:  0px 4px 12px rgba(0,0,0,0.04);
+      --shadow-elevated: 0px 4px 12px rgba(0,0,0,0.15);
+    }
+
+    body {
+      font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: var(--bg-app);
+      width: 1980px;
+      min-height: 1244px;
+      display: flex;
+      letter-spacing: -0.01em;
+      color: var(--text-primary);
+    }
+
+    /* ─── Sidebar ─── */
+    .sidebar {
+      width: 319px;
+      min-height: 1244px;
+      display: flex;
+      flex-shrink: 0;
+      background: var(--bg-surface);
+      border-right: 1px solid var(--border-default);
+    }
+
+    /* Icon bar */
+    .icon-bar {
+      width: 68px;
+      min-height: 100%;
+      background: var(--gray-900);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 16px 0;
+      gap: 4px;
+    }
+    .icon-bar-logo {
+      width: 36px; height: 36px;
+      background: var(--purple-500);
+      border-radius: 10px;
+      display: flex; align-items: center; justify-content: center;
+      color: white; font-size: 18px; font-weight: 700;
+      margin-bottom: 16px;
+    }
+    .icon-bar-item {
+      width: 48px; height: 48px;
+      border-radius: 10px;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      gap: 3px;
+      cursor: pointer;
+      position: relative;
+    }
+    .icon-bar-item.active {
+      background: rgba(124,92,252,0.15);
+    }
+    .icon-bar-item svg { opacity: 0.5; }
+    .icon-bar-item.active svg { opacity: 1; }
+    .icon-bar-item .icon-label {
+      font-size: 9px; font-weight: 500;
+      color: var(--gray-400);
+      letter-spacing: -0.01em;
+    }
+    .icon-bar-item.active .icon-label { color: var(--purple-500); }
+
+    /* List bar */
+    .list-bar {
+      width: 251px;
+      padding: 24px 8px;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+    .list-bar-title {
+      font-size: 11px; font-weight: 600;
+      color: var(--text-tertiary);
+      letter-spacing: -0.01em;
+      padding: 0 10px;
+      margin-bottom: 4px;
+      text-transform: uppercase;
+    }
+    .list-item {
+      display: flex; align-items: center;
+      gap: 8px;
+      padding: 8px 10px;
+      border-radius: 6px;
+      font-size: 13px;
+      color: var(--text-secondary);
+      cursor: pointer;
+      font-weight: 400;
+    }
+    .list-item:hover { background: var(--gray-50); }
+    .list-item.active {
+      background: var(--bg-brand-subtle);
+      color: var(--text-brand);
+      font-weight: 500;
+    }
+    .list-item-dot {
+      width: 6px; height: 6px;
+      border-radius: 50%;
+      background: currentColor;
+      opacity: 0.5;
+      flex-shrink: 0;
+    }
+    .list-item.active .list-item-dot { opacity: 1; }
+
+    /* Credit box */
+    .credit-box {
+      margin-top: auto;
+      background: var(--bg-brand-subtle);
+      border-radius: 12px;
+      padding: 16px;
+      margin-left: 4px;
+      margin-right: 4px;
+    }
+    .credit-label {
+      font-size: 11px; font-weight: 500;
+      color: var(--purple-600);
+      margin-bottom: 4px;
+    }
+    .credit-value {
+      font-size: 28px; font-weight: 700;
+      color: var(--purple-700);
+      letter-spacing: -0.03em;
+      line-height: 1.2;
+    }
+    .credit-desc {
+      font-size: 11px;
+      color: var(--purple-500);
+      margin-top: 4px;
+      opacity: 0.7;
+    }
+
+    /* ─── Main ─── */
+    .main {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      min-height: 1244px;
+    }
+
+    /* Header */
+    .header {
+      height: 100px;
+      background: var(--bg-surface);
+      border-bottom: 1px solid var(--border-default);
+      padding: 0 32px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-shrink: 0;
+    }
+    .header-left h1 {
+      font-size: 20px; font-weight: 600;
+      color: var(--text-primary);
+      letter-spacing: -0.03em;
+      line-height: 1.2;
+    }
+    .header-left p {
+      font-size: 13px;
+      color: var(--text-tertiary);
+      margin-top: 4px;
+      letter-spacing: -0.01em;
+    }
+    .header-right {
+      display: flex; align-items: center; gap: 12px;
+    }
+    .btn-history {
+      font-size: 13px;
+      color: var(--text-secondary);
+      background: none; border: 1px solid var(--border-default);
+      border-radius: 6px;
+      padding: 7px 14px;
+      cursor: pointer;
+      font-weight: 400;
+      letter-spacing: -0.01em;
+    }
+    .btn-primary {
+      font-size: 13px; font-weight: 600;
+      color: white;
+      background: var(--bg-brand);
+      border: none;
+      border-radius: 6px;
+      padding: 8px 18px;
+      cursor: pointer;
+      display: flex; align-items: center; gap: 6px;
+      letter-spacing: -0.01em;
+      box-shadow: var(--shadow-subtle);
+    }
+
+    /* Content */
+    .content {
+      flex: 1;
+      padding: 32px;
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+    }
+
+    /* Hero */
+    .hero-card {
+      background: linear-gradient(135deg, #7C5CFC 0%, #5236BF 100%);
+      border-radius: 16px;
+      padding: 48px 56px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: relative;
+      overflow: hidden;
+    }
+    .hero-card::before {
+      content: '';
+      position: absolute;
+      width: 320px; height: 320px;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.06);
+      top: -80px; right: 200px;
+    }
+    .hero-card::after {
+      content: '';
+      position: absolute;
+      width: 200px; height: 200px;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.04);
+      bottom: -60px; right: 320px;
+    }
+    .hero-text .badge {
+      display: inline-flex; align-items: center; gap: 6px;
+      background: rgba(255,255,255,0.15);
+      border: 1px solid rgba(255,255,255,0.2);
+      border-radius: 20px;
+      padding: 4px 12px;
+      font-size: 12px; font-weight: 500;
+      color: rgba(255,255,255,0.9);
+      margin-bottom: 20px;
+      letter-spacing: -0.01em;
+    }
+    .hero-text h2 {
+      font-size: 32px; font-weight: 700;
+      color: white;
+      letter-spacing: -0.03em;
+      line-height: 1.2;
+      margin-bottom: 12px;
+    }
+    .hero-text p {
+      font-size: 16px;
+      color: rgba(255,255,255,0.75);
+      letter-spacing: -0.01em;
+      line-height: 1.5;
+      margin-bottom: 32px;
+    }
+    .hero-cta {
+      display: flex; gap: 12px;
+    }
+    .btn-hero-primary {
+      font-size: 14px; font-weight: 600;
+      color: var(--purple-700);
+      background: white;
+      border: none; border-radius: 8px;
+      padding: 12px 24px;
+      cursor: pointer;
+      display: flex; align-items: center; gap: 8px;
+      letter-spacing: -0.01em;
+    }
+    .btn-hero-secondary {
+      font-size: 14px; font-weight: 500;
+      color: rgba(255,255,255,0.85);
+      background: rgba(255,255,255,0.12);
+      border: 1px solid rgba(255,255,255,0.2);
+      border-radius: 8px;
+      padding: 12px 24px;
+      cursor: pointer;
+      letter-spacing: -0.01em;
+    }
+    .hero-visual {
+      display: flex; gap: 16px;
+      position: relative; z-index: 1;
+      flex-shrink: 0;
+    }
+    .banner-preview {
+      width: 200px; height: 130px;
+      border-radius: 12px;
+      background: rgba(255,255,255,0.15);
+      border: 1px solid rgba(255,255,255,0.2);
+      backdrop-filter: blur(4px);
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      gap: 8px;
+    }
+    .banner-preview.main-preview {
+      width: 260px; height: 160px;
+      background: rgba(255,255,255,0.2);
+      border: 1px solid rgba(255,255,255,0.3);
+    }
+    .preview-img {
+      width: 56px; height: 56px;
+      border-radius: 10px;
+      background: rgba(255,255,255,0.3);
+    }
+    .preview-line-lg {
+      width: 100px; height: 8px;
+      border-radius: 4px;
+      background: rgba(255,255,255,0.5);
+    }
+    .preview-line-sm {
+      width: 64px; height: 6px;
+      border-radius: 3px;
+      background: rgba(255,255,255,0.3);
+    }
+    .banner-preview.main-preview .preview-img {
+      width: 64px; height: 64px;
+    }
+    .banner-preview.main-preview .preview-line-lg { width: 120px; }
+
+    /* Section title */
+    .section-title {
+      font-size: 16px; font-weight: 600;
+      color: var(--text-primary);
+      letter-spacing: -0.02em;
+      margin-bottom: 16px;
+    }
+
+    /* How it works */
+    .steps-row {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+    }
+    .step-card {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-default);
+      border-radius: 12px;
+      padding: 24px;
+      box-shadow: var(--shadow-subtle);
+      position: relative;
+    }
+    .step-number {
+      width: 28px; height: 28px;
+      border-radius: 50%;
+      background: var(--bg-brand-subtle);
+      color: var(--text-brand);
+      font-size: 13px; font-weight: 700;
+      display: flex; align-items: center; justify-content: center;
+      margin-bottom: 16px;
+      letter-spacing: -0.01em;
+    }
+    .step-icon {
+      font-size: 28px;
+      margin-bottom: 12px;
+      display: block;
+    }
+    .step-card h3 {
+      font-size: 14px; font-weight: 600;
+      color: var(--text-primary);
+      letter-spacing: -0.02em;
+      margin-bottom: 6px;
+    }
+    .step-card p {
+      font-size: 13px;
+      color: var(--text-secondary);
+      letter-spacing: -0.01em;
+      line-height: 1.5;
+    }
+    .step-arrow {
+      position: absolute;
+      right: -22px; top: 50%;
+      transform: translateY(-50%);
+      color: var(--gray-300);
+      font-size: 18px;
+      z-index: 1;
+    }
+
+    /* Empty state */
+    .recent-section {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-default);
+      border-radius: 12px;
+      padding: 32px;
+      box-shadow: var(--shadow-subtle);
+    }
+    .recent-header {
+      display: flex; align-items: center; justify-content: space-between;
+      margin-bottom: 32px;
+    }
+    .empty-state {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 32px 0 16px;
+      gap: 12px;
+    }
+    .empty-icon {
+      width: 64px; height: 64px;
+      background: var(--bg-surface-secondary);
+      border-radius: 16px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 28px;
+      margin-bottom: 4px;
+    }
+    .empty-state h4 {
+      font-size: 14px; font-weight: 600;
+      color: var(--text-secondary);
+      letter-spacing: -0.02em;
+    }
+    .empty-state p {
+      font-size: 13px;
+      color: var(--text-tertiary);
+      letter-spacing: -0.01em;
+    }
+
+    /* Info row */
+    .info-row {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+    }
+    .info-card {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-default);
+      border-radius: 12px;
+      padding: 20px 24px;
+      box-shadow: var(--shadow-subtle);
+      display: flex; align-items: center; gap: 16px;
+    }
+    .info-card-icon {
+      width: 44px; height: 44px;
+      border-radius: 10px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 20px;
+      flex-shrink: 0;
+    }
+    .info-card-icon.purple { background: var(--purple-50); }
+    .info-card-icon.green  { background: #F0FDF4; }
+    .info-card-icon.amber  { background: #FFFBEB; }
+    .info-card-text h4 {
+      font-size: 13px; font-weight: 600;
+      color: var(--text-primary);
+      letter-spacing: -0.02em;
+      margin-bottom: 2px;
+    }
+    .info-card-text p {
+      font-size: 12px;
+      color: var(--text-tertiary);
+      letter-spacing: -0.01em;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <!-- Icon bar -->
+    <div class="icon-bar">
+      <div class="icon-bar-logo">α</div>
+      <div class="icon-bar-item">
+        <svg width="20" height="20" fill="none" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1" fill="white"/><rect x="14" y="3" width="7" height="7" rx="1" fill="white"/><rect x="3" y="14" width="7" height="7" rx="1" fill="white"/><rect x="14" y="14" width="7" height="7" rx="1" fill="white"/></svg>
+        <span class="icon-label">홈</span>
+      </div>
+      <div class="icon-bar-item active">
+        <svg width="20" height="20" fill="none" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2" stroke="#7C5CFC" stroke-width="1.8"/><path d="M8 12h8M12 8v8" stroke="#7C5CFC" stroke-width="1.8" stroke-linecap="round"/></svg>
+        <span class="icon-label">스튜디오</span>
+      </div>
+      <div class="icon-bar-item">
+        <svg width="20" height="20" fill="none" viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h10" stroke="white" stroke-width="1.8" stroke-linecap="round"/></svg>
+        <span class="icon-label">배너</span>
+      </div>
+      <div class="icon-bar-item">
+        <svg width="20" height="20" fill="none" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" stroke="white" stroke-width="1.8"/><path d="M12 8v4l3 3" stroke="white" stroke-width="1.8" stroke-linecap="round"/></svg>
+        <span class="icon-label">설정</span>
+      </div>
+    </div>
+
+    <!-- List bar -->
+    <div class="list-bar">
+      <div class="list-bar-title">알파캔버스</div>
+      <div class="list-item">
+        <span class="list-item-dot"></span>
+        대시보드
+      </div>
+      <div class="list-item">
+        <span class="list-item-dot"></span>
+        스킨 에디터
+      </div>
+      <div class="list-item active">
+        <span class="list-item-dot"></span>
+        콘텐츠 스튜디오
+      </div>
+      <div class="list-item">
+        <span class="list-item-dot"></span>
+        배너 관리
+      </div>
+      <div class="list-item">
+        <span class="list-item-dot"></span>
+        설정
+      </div>
+
+      <!-- Credit box -->
+      <div class="credit-box" style="margin-top: 48px;">
+        <div class="credit-label">남은 크레딧</div>
+        <div class="credit-value">42</div>
+        <div class="credit-desc">스킨 구매 기준 50cr 제공</div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- Main -->
+  <main class="main">
+    <!-- Header -->
+    <header class="header">
+      <div class="header-left">
+        <h1>콘텐츠 스튜디오</h1>
+        <p>AI로 쇼핑몰 배너를 5~10분 안에 만들어보세요</p>
+      </div>
+      <div class="header-right">
+        <button class="btn-history">생성 기록 보기</button>
+        <button class="btn-primary">
+          <svg width="14" height="14" fill="none" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14" stroke="white" stroke-width="2.5" stroke-linecap="round"/></svg>
+          AI 배너 만들기
+        </button>
+      </div>
+    </header>
+
+    <!-- Content -->
+    <div class="content">
+
+      <!-- Hero -->
+      <div class="hero-card">
+        <div class="hero-text">
+          <div class="badge">
+            ✨ AI 배너 생성
+          </div>
+          <h2>디자인 경험 없어도<br>5분이면 배너 완성</h2>
+          <p>레퍼런스 선택 → 제품사진 업로드 → AI 생성<br>3단계로 쇼핑몰 배너를 만들어드려요</p>
+          <div class="hero-cta">
+            <button class="btn-hero-primary">
+              🚀 지금 바로 만들기
+            </button>
+            <button class="btn-hero-secondary">사용 방법 보기</button>
+          </div>
+        </div>
+        <div class="hero-visual">
+          <div class="banner-preview" style="margin-top: 24px;">
+            <div class="preview-img"></div>
+            <div class="preview-line-lg"></div>
+            <div class="preview-line-sm"></div>
+          </div>
+          <div class="banner-preview main-preview">
+            <div class="preview-img"></div>
+            <div class="preview-line-lg"></div>
+            <div class="preview-line-sm"></div>
+          </div>
+          <div class="banner-preview" style="margin-top: 24px;">
+            <div class="preview-img"></div>
+            <div class="preview-line-lg"></div>
+            <div class="preview-line-sm"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Info row -->
+      <div class="info-row">
+        <div class="info-card">
+          <div class="info-card-icon purple">🎨</div>
+          <div class="info-card-text">
+            <h4>레퍼런스 기반 스타일</h4>
+            <p>업종·카테고리별 큐레이팅된 레퍼런스<br>선택만 하면 스타일이 완성돼요</p>
+          </div>
+        </div>
+        <div class="info-card">
+          <div class="info-card-icon green">📱</div>
+          <div class="info-card-text">
+            <h4>PC·MO 자동 세트 생성</h4>
+            <p>PC 배너 생성 시 모바일 사이즈도<br>자동으로 함께 만들어드려요</p>
+          </div>
+        </div>
+        <div class="info-card">
+          <div class="info-card-icon amber">⚡</div>
+          <div class="info-card-text">
+            <h4>스킨 원클릭 적용</h4>
+            <p>알파캔버스 스킨 사용 중이라면<br>배너 슬롯에 바로 자동 적용돼요</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- How it works -->
+      <div>
+        <div class="section-title">이렇게 만들어요</div>
+        <div class="steps-row">
+          <div class="step-card">
+            <div class="step-number">1</div>
+            <span class="step-icon">🎯</span>
+            <h3>배너 목적 선택</h3>
+            <p>제품 홍보, 기획전, 혜택 안내 중<br>원하는 목적을 선택하세요</p>
+            <span class="step-arrow">→</span>
+          </div>
+          <div class="step-card">
+            <div class="step-number">2</div>
+            <span class="step-icon">🖼️</span>
+            <h3>스타일 & 이미지 선택</h3>
+            <p>마음에 드는 레퍼런스를 고르고<br>제품 사진을 업로드하세요</p>
+            <span class="step-arrow">→</span>
+          </div>
+          <div class="step-card">
+            <div class="step-number">3</div>
+            <span class="step-icon">✨</span>
+            <h3>AI 생성 & 적용</h3>
+            <p>AI가 3가지 옵션을 만들어드려요<br>마음에 드는 걸 골라 바로 적용</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Recent banners empty state -->
+      <div class="recent-section">
+        <div class="recent-header">
+          <div class="section-title" style="margin-bottom:0;">최근 생성 배너</div>
+          <span style="font-size:12px; color:var(--text-tertiary); letter-spacing:-0.01em;">최근 30일 기준</span>
+        </div>
+        <div class="empty-state">
+          <div class="empty-icon">🖼️</div>
+          <h4>아직 생성된 배너가 없어요</h4>
+          <p>AI 배너 만들기를 눌러 첫 번째 배너를 만들어보세요</p>
+        </div>
+      </div>
+
+    </div>
+  </main>
+
+</body>
+</html>
