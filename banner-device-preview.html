@@ -514,7 +514,6 @@
       </div>
 
       <div id="mo-ai">
-        <p class="mo-hint">PC에서 선택한 이미지를 모바일 화면에 맞게 잘라주세요</p>
         <div class="mockup-container" onclick="openModal('mo')">
           <div class="phone-wrap">
             <div class="phone">
@@ -539,6 +538,12 @@
           </div>
         </div>
 
+        <div class="banner-grid" id="mo-grid">
+          <div class="banner-card b1 selected" onclick="selectBanner('mo',this,'b1')"></div>
+          <div class="banner-card b2" onclick="selectBanner('mo',this,'b2')"></div>
+          <div class="banner-card b3" onclick="selectBanner('mo',this,'b3')"></div>
+          <div class="banner-card b4" onclick="selectBanner('mo',this,'b4')"></div>
+        </div>
         <div class="crop-done-badge" id="crop-badge">
           <span>✓</span> 4:3 비율로 잘렸어요
         </div>
@@ -624,7 +629,7 @@
 </div>
 
 <script>
-  let currentColor = 'b1';
+  let currentColor = { pc: 'b1', mo: 'b1' };
   let currentRatio = '4:3';
   let cropDone = false;
 
@@ -641,11 +646,7 @@
     '3:4': '3:4 비율로 자르기',
     '16:9': '16:9 비율로 자르기',
   };
-  const ratioKo = {
-    '4:3': '4:3',
-    '3:4': '3:4',
-    '16:9': '16:9',
-  };
+  const ratioKo = { '4:3': '4:3', '3:4': '3:4', '16:9': '16:9' };
 
   function switchTab(section, type) {
     const tabs = document.getElementById(section + '-tabs').querySelectorAll('.tab');
@@ -655,19 +656,21 @@
     document.getElementById(section + '-ai').style.display = type === 'ai' ? 'block' : 'none';
   }
 
-  function selectBanner(el, colorClass) {
-    document.getElementById('pc-grid').querySelectorAll('.banner-card').forEach(c => c.classList.remove('selected'));
+  function selectBanner(section, el, colorClass) {
+    document.getElementById(section + '-grid').querySelectorAll('.banner-card').forEach(c => c.classList.remove('selected'));
     el.classList.add('selected');
-    currentColor = colorClass;
+    currentColor[section] = colorClass;
 
-    document.getElementById('pc-preview').className = 'browser-banner ' + colorClass;
-    document.getElementById('mo-preview').className = 'phone-banner ' + colorClass;
-
-    // PC 이미지 바뀌면 모바일 크롭 리셋
-    if (cropDone) {
-      cropDone = false;
-      document.getElementById('crop-badge').classList.remove('show');
-      document.getElementById('mo-apply').disabled = true;
+    if (section === 'pc') {
+      document.getElementById('pc-preview').className = 'browser-banner ' + colorClass;
+    } else {
+      document.getElementById('mo-preview').className = 'phone-banner ' + colorClass;
+      // 모바일 이미지 바뀌면 크롭 리셋
+      if (cropDone) {
+        cropDone = false;
+        document.getElementById('crop-badge').classList.remove('show');
+        document.getElementById('mo-apply').disabled = true;
+      }
     }
   }
 
@@ -677,11 +680,11 @@
     const label = document.getElementById('modal-label');
 
     if (section === 'pc') {
-      document.getElementById('modal-pc-banner').className = 'modal-browser-banner ' + currentColor;
+      document.getElementById('modal-pc-banner').className = 'modal-browser-banner ' + currentColor.pc;
       label.textContent = 'PC 배너 미리보기';
       label.style.display = '';
     } else {
-      document.getElementById('crop-image').className = 'crop-image ' + currentColor;
+      document.getElementById('crop-image').className = 'crop-image ' + currentColor.mo;
       currentRatio = '4:3';
       document.querySelectorAll('.ratio-tab').forEach((t, i) => t.classList.toggle('active', i === 0));
       document.getElementById('crop-ratio-label').textContent = ratioLabels['4:3'];
