@@ -1,0 +1,771 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>콘텐츠 배너 설정 — 패널 내 화면 전환</title>
+<link href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css" rel="stylesheet">
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: 'Pretendard', sans-serif;
+  height: 100vh;
+  display: flex;
+  overflow: hidden;
+}
+
+/* ══════════════════════════════
+   CANVAS AREA
+══════════════════════════════ */
+.canvas-area {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #C9CBD0;
+  overflow: hidden;
+  padding: 24px 24px 24px 24px;
+}
+
+.fake-page {
+  width: 100%;
+  max-width: 860px;
+  background: #fff;
+  border-radius: 10px;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.18);
+  overflow: hidden;
+}
+.fake-bar {
+  background: #F3F4F6;
+  padding: 7px 10px;
+  display: flex; align-items: center; gap: 5px;
+  border-bottom: 1px solid #E5E7EB;
+}
+.fdot { width: 9px; height: 9px; border-radius: 50%; flex-shrink: 0; }
+.fdot-r { background: #FCA5A5; } .fdot-y { background: #FCD34D; } .fdot-g { background: #6EE7B7; }
+.furl { flex: 1; height: 15px; background: #E5E7EB; border-radius: 4px; margin-left: 6px; font-size: 9px; color: #9CA3AF; display: flex; align-items: center; padding-left: 8px; }
+.fake-nav { height: 42px; background: #fff; border-bottom: 1px solid #F3F4F6; display: flex; align-items: center; padding: 0 20px; gap: 20px; }
+.fn-logo { width: 70px; height: 13px; background: #374151; border-radius: 2px; }
+.fn-items { display: flex; gap: 12px; flex: 1; }
+.fn-item { width: 32px; height: 8px; background: #E5E7EB; border-radius: 2px; }
+.fn-right { display: flex; gap: 8px; }
+.fn-icon { width: 18px; height: 18px; background: #E5E7EB; border-radius: 50%; }
+
+.fake-hero {
+  height: 180px;
+  background: #EBEBEB;
+  transition: background 0.4s ease;
+  position: relative;
+  outline: 2px solid #F97316;
+  outline-offset: -2px;
+}
+.fake-hero-label {
+  position: absolute; top: 0; left: 0;
+  background: #F97316; color: #fff;
+  font-size: 9px; font-weight: 700;
+  padding: 3px 8px; border-radius: 0 0 4px 0;
+}
+.hero-text {
+  position: absolute; bottom: 20px; left: 24px;
+  font-size: 20px; font-weight: 700;
+  color: rgba(0,0,0,0.18);
+  transition: color 0.4s ease;
+}
+
+.fake-section { padding: 16px 20px; display: flex; gap: 8px; background: #F9FAFB; }
+.fake-card { flex: 1; height: 52px; background: #E5E7EB; border-radius: 6px; }
+
+/* ══════════════════════════════
+   PANEL
+══════════════════════════════ */
+.panel {
+  width: 320px;
+  height: 100vh;
+  background: #fff;
+  border-left: 1px solid #E5E7EB;
+  display: flex;
+  flex-direction: column;
+  flex-shrink: 0;
+}
+
+.panel-header {
+  padding: 11px 16px;
+  border-bottom: 1px solid #F3F4F6;
+  display: flex; align-items: center; justify-content: space-between;
+  flex-shrink: 0;
+}
+.panel-title { font-size: 13px; font-weight: 700; color: #111827; }
+.saving-chip { font-size: 11px; font-weight: 600; color: #F97316; }
+
+/* ── Slides ── */
+.slides-vp {
+  flex: 1;
+  overflow: hidden;
+  position: relative;
+}
+.slides {
+  display: flex;
+  height: 100%;
+  transition: transform 0.28s cubic-bezier(0.4,0,0.2,1);
+}
+.slide {
+  width: 320px;
+  flex-shrink: 0;
+  height: 100%;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+/* Slide subheader */
+.slide-hd {
+  position: sticky; top: 0; z-index: 1;
+  background: #fff;
+  padding: 10px 14px;
+  border-bottom: 1px solid #F3F4F6;
+  display: flex; align-items: center; gap: 10px;
+}
+.back-btn {
+  display: flex; align-items: center; gap: 3px;
+  font-size: 12px; font-weight: 500; color: #6B7280;
+  background: none; border: none; cursor: pointer;
+  font-family: 'Pretendard', sans-serif; padding: 0;
+}
+.back-btn:hover { color: #111827; }
+.slide-hd-title { font-size: 13px; font-weight: 700; color: #111827; }
+.slide-hd-target {
+  font-size: 10px; font-weight: 600; color: #7C3AED;
+  background: #F5F2FF; border-radius: 4px;
+  padding: 2px 6px; margin-left: auto;
+}
+
+/* ── Main slide content ── */
+.acc-row {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 11px 16px;
+  border-bottom: 1px solid #F3F4F6;
+  cursor: pointer; user-select: none;
+}
+.acc-row:hover { background: #FAFAFA; }
+.acc-label { font-size: 13px; font-weight: 600; color: #374151; }
+.acc-chevron { color: #9CA3AF; font-size: 10px; }
+.acc-open .acc-chevron { transform: rotate(180deg); }
+
+.sec { padding: 10px 14px; border-bottom: 1px solid #F3F4F6; }
+
+.fld-label {
+  font-size: 11px; font-weight: 600; color: #374151;
+  margin-bottom: 7px;
+  display: flex; align-items: center; gap: 3px;
+}
+.req { color: #EF4444; font-size: 10px; font-weight: 700; }
+.info { width: 13px; height: 13px; border-radius: 50%; border: 1px solid #D1D5DB; color: #9CA3AF; font-size: 8px; display: inline-flex; align-items: center; justify-content: center; cursor: default; }
+
+/* 배너 항목 row */
+.item-row {
+  display: flex; align-items: center;
+  padding: 7px 14px;
+  border-bottom: 1px solid #F3F4F6; gap: 6px;
+}
+.item-handle { color: #D1D5DB; font-size: 14px; cursor: grab; }
+.item-tag {
+  background: #F3F4F6; color: #374151;
+  font-size: 11px; font-weight: 700;
+  padding: 2px 7px; border-radius: 4px; flex: 1;
+}
+.item-icons { display: flex; gap: 4px; }
+.iicon { width: 22px; height: 22px; display: flex; align-items: center; justify-content: center; color: #9CA3AF; font-size: 12px; cursor: pointer; border-radius: 4px; }
+.iicon:hover { background: #F3F4F6; color: #374151; }
+
+/* Sub-tabs */
+.sub-tabs {
+  display: flex;
+  background: #F3F4F6;
+  border-radius: 8px;
+  padding: 3px; gap: 2px;
+  margin-bottom: 9px;
+}
+.sub-tab {
+  flex: 1; text-align: center;
+  padding: 5px 0;
+  font-size: 11px; font-weight: 500; color: #9CA3AF;
+  cursor: pointer; border-radius: 6px;
+  transition: all 0.15s; user-select: none;
+}
+.sub-tab.active { background: #fff; color: #7C3AED; font-weight: 700; box-shadow: 0 1px 4px rgba(0,0,0,0.08); }
+
+/* Upload content */
+.upload-row { display: flex; gap: 6px; margin-bottom: 7px; }
+.url-inp {
+  flex: 1; height: 30px;
+  border: 1px solid #E5E7EB; border-radius: 6px;
+  padding: 0 8px; font-size: 11px;
+  font-family: 'Pretendard', sans-serif; color: #374151; outline: none;
+}
+.url-inp:focus { border-color: #7C3AED; }
+.upload-btn {
+  height: 30px; padding: 0 10px;
+  font-size: 11px; font-weight: 600; color: #374151;
+  border: 1px solid #E5E7EB; border-radius: 6px;
+  background: #F9FAFB; cursor: pointer;
+  font-family: 'Pretendard', sans-serif; white-space: nowrap;
+}
+.img-thumb {
+  width: 100%; height: 52px;
+  border-radius: 6px; border: 1px solid #E5E7EB;
+  background: #F3F4F6;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 9px; color: #D1D5DB; overflow: hidden;
+}
+
+/* AI 배너 적용 상태 */
+.ai-applied {
+  display: flex; align-items: center; gap: 8px;
+  padding: 7px 9px;
+  border: 1.5px solid #C4B5FD;
+  border-radius: 8px; background: #FAFAFF;
+}
+.ai-thumb-sm { width: 58px; height: 36px; border-radius: 5px; flex-shrink: 0; }
+.ai-app-info { flex: 1; }
+.ai-app-label { font-size: 11px; font-weight: 600; color: #6D28D9; }
+.ai-app-sub { font-size: 10px; color: #9CA3AF; margin-top: 1px; }
+.ai-change { font-size: 11px; font-weight: 500; color: #6B7280; background: #fff; border: 1px solid #E5E7EB; border-radius: 5px; padding: 3px 8px; cursor: pointer; font-family: 'Pretendard', sans-serif; flex-shrink: 0; }
+.ai-change:hover { background: #F3F4F6; }
+
+.crop-badge { display: none; align-items: center; gap: 3px; font-size: 10px; font-weight: 600; color: #059669; margin-top: 5px; }
+.crop-badge.show { display: flex; }
+
+/* Simple inputs */
+.sim-inp {
+  width: 100%; height: 30px;
+  border: 1px solid #E5E7EB; border-radius: 6px;
+  padding: 0 8px; font-size: 12px;
+  font-family: 'Pretendard', sans-serif; color: #374151; outline: none;
+}
+.sim-inp:focus { border-color: #7C3AED; }
+
+.del-btn { height: 28px; border: 1px solid #FCA5A5; border-radius: 6px; background: #fff; font-size: 11px; font-weight: 600; color: #EF4444; cursor: pointer; font-family: 'Pretendard', sans-serif; padding: 0 10px; }
+
+/* ── AI Select slide ── */
+.ai-inner { padding: 14px; display: flex; flex-direction: column; gap: 12px; }
+.ai-hint { font-size: 11px; color: #9CA3AF; line-height: 1.5; }
+
+.banner-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.bc {
+  border-radius: 8px; height: 72px;
+  cursor: pointer; position: relative;
+  border: 2.5px solid transparent;
+  transition: border-color 0.15s, transform 0.1s;
+  user-select: none;
+}
+.bc:hover { transform: scale(1.02); }
+.bc.selected { border-color: #7C3AED; box-shadow: 0 0 0 1px #7C3AED; }
+.bc.selected::after {
+  content: '✓';
+  position: absolute; top: 5px; right: 5px;
+  width: 18px; height: 18px;
+  background: #7C3AED; color: #fff; border-radius: 50%;
+  font-size: 10px; display: flex; align-items: center; justify-content: center;
+}
+
+.b1 { background: linear-gradient(135deg, #a8edea, #fed6e3); }
+.b2 { background: linear-gradient(135deg, #c3aed6, #f9e4b7); }
+.b3 { background: linear-gradient(135deg, #89f7fe, #66a6ff); }
+.b4 { background: linear-gradient(135deg, #fddb92, #d1fdff); }
+
+.btn-more {
+  width: 100%; height: 32px;
+  background: #fff; color: #7C3AED;
+  font-size: 11px; font-weight: 600;
+  border: 1.5px dashed #C4B5FD; border-radius: 8px;
+  cursor: pointer; font-family: 'Pretendard', sans-serif;
+  transition: background 0.15s;
+}
+.btn-more:hover { background: #F5F2FF; }
+
+/* 모바일 자르기 안내 */
+.crop-hint {
+  display: none;
+  background: #F5F2FF; border: 1.5px solid #C4B5FD;
+  border-radius: 8px; padding: 10px 12px;
+}
+.crop-hint.show { display: block; }
+.crop-hint-title { font-size: 11px; font-weight: 600; color: #6D28D9; margin-bottom: 8px; }
+.crop-hint-btns { display: flex; gap: 6px; }
+.btn-direct { flex: 1; height: 30px; background: #fff; color: #374151; font-size: 11px; font-weight: 500; border: 1px solid #E5E7EB; border-radius: 6px; cursor: pointer; font-family: 'Pretendard', sans-serif; }
+.btn-crop { flex: 1.5; height: 30px; background: #7C3AED; color: #fff; font-size: 11px; font-weight: 600; border: none; border-radius: 6px; cursor: pointer; font-family: 'Pretendard', sans-serif; }
+.btn-crop:hover { background: #6D28D9; }
+
+/* ── Panel footer ── */
+.panel-footer {
+  padding: 10px 12px;
+  border-top: 1px solid #F3F4F6;
+  display: flex; gap: 8px;
+  flex-shrink: 0;
+}
+.btn-cancel { flex: 1; height: 34px; border: 1px solid #E5E7EB; border-radius: 8px; background: #fff; font-size: 12px; font-weight: 500; color: #6B7280; cursor: pointer; font-family: 'Pretendard', sans-serif; }
+.btn-save { flex: 1; height: 34px; border: none; border-radius: 8px; background: #7C3AED; font-size: 12px; font-weight: 600; color: #fff; cursor: pointer; font-family: 'Pretendard', sans-serif; }
+.btn-save:hover { background: #6D28D9; }
+.btn-ai-apply { flex: 2; height: 34px; border: none; border-radius: 8px; font-size: 12px; font-weight: 600; color: #fff; cursor: default; font-family: 'Pretendard', sans-serif; background: #C4B5FD; transition: background 0.15s; }
+.btn-ai-apply.on { background: #7C3AED; cursor: pointer; }
+.btn-ai-apply.on:hover { background: #6D28D9; }
+
+/* ══════════════════════════════
+   CROP MODAL
+══════════════════════════════ */
+.modal-bg {
+  display: none; position: fixed; inset: 0;
+  background: rgba(17,24,39,0.75); z-index: 200;
+  align-items: center; justify-content: center;
+  backdrop-filter: blur(4px);
+}
+.modal-bg.open { display: flex; }
+.crop-box-wrap { animation: fadeUp 0.2s ease; }
+@keyframes fadeUp { from { opacity:0; transform:translateY(12px); } to { opacity:1; transform:translateY(0); } }
+
+.crop-modal {
+  width: 500px; background: #1E2433;
+  border-radius: 16px; overflow: hidden;
+  box-shadow: 0 24px 64px rgba(0,0,0,0.5);
+}
+.crop-mhd { padding: 16px 20px; display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; }
+.crop-title { font-size: 14px; font-weight: 700; color: #fff; margin-bottom: 3px; }
+.crop-sub { font-size: 11px; color: rgba(255,255,255,0.45); }
+.ratio-tabs { display: flex; gap: 4px; flex-shrink: 0; }
+.ratio-tab { padding: 5px 10px; font-size: 12px; font-weight: 600; border: 1.5px solid rgba(255,255,255,0.15); border-radius: 6px; background: transparent; color: rgba(255,255,255,0.45); cursor: pointer; font-family: 'Pretendard', sans-serif; transition: all 0.15s; }
+.ratio-tab.active { border-color: #7C3AED; color: #fff; background: rgba(124,58,237,0.25); }
+.ratio-tab:hover:not(.active) { color: rgba(255,255,255,0.7); border-color: rgba(255,255,255,0.3); }
+
+.crop-area { position: relative; width: 500px; height: 200px; overflow: hidden; }
+.crop-img { width: 100%; height: 100%; display: block; }
+.crop-frame {
+  position: absolute; border: 1.5px solid #fff;
+  box-shadow: 0 0 0 9999px rgba(0,0,0,0.55);
+  z-index: 2; transition: all 0.22s cubic-bezier(0.4,0,0.2,1); cursor: move;
+}
+.grid-lines { position: absolute; inset: 0; }
+.gv, .gh { position: absolute; background: rgba(255,255,255,0.22); }
+.gv { width: 1px; top: 0; bottom: 0; }
+.gv:nth-child(1) { left: 33.33%; } .gv:nth-child(2) { left: 66.66%; }
+.gh { height: 1px; left: 0; right: 0; }
+.gh:nth-child(3) { top: 33.33%; } .gh:nth-child(4) { top: 66.66%; }
+.crn { position: absolute; width: 12px; height: 12px; border-color: #fff; border-style: solid; }
+.crn.tl { top:-1px; left:-1px; border-width:2.5px 0 0 2.5px; }
+.crn.tr { top:-1px; right:-1px; border-width:2.5px 2.5px 0 0; }
+.crn.bl { bottom:-1px; left:-1px; border-width:0 0 2.5px 2.5px; }
+.crn.br { bottom:-1px; right:-1px; border-width:0 2.5px 2.5px 0; }
+
+.crop-mft { padding: 12px 20px 16px; display: flex; gap: 8px; justify-content: flex-end; align-items: center; }
+.crop-mft-left { flex: 1; font-size: 11px; color: rgba(255,255,255,0.35); }
+.btn-crop-cancel { padding: 8px 18px; border-radius: 8px; border: 1.5px solid rgba(255,255,255,0.15); background: transparent; font-size: 13px; font-weight: 500; color: rgba(255,255,255,0.55); cursor: pointer; font-family: 'Pretendard', sans-serif; transition: all 0.15s; }
+.btn-crop-cancel:hover { background: rgba(255,255,255,0.08); }
+.btn-crop-done { padding: 8px 20px; border-radius: 8px; border: none; background: #7C3AED; font-size: 13px; font-weight: 600; color: #fff; cursor: pointer; font-family: 'Pretendard', sans-serif; transition: background 0.15s; }
+.btn-crop-done:hover { background: #6D28D9; }
+</style>
+</head>
+<body>
+
+<div style="position:fixed;top:12px;left:50%;transform:translateX(-50%);z-index:9999;background:#1A1F2B;color:#fff;font-family:'Pretendard',sans-serif;font-size:12px;font-weight:500;padding:6px 14px;border-radius:100px;white-space:nowrap;pointer-events:none;">⚠️ 스타일 미확정 — 플로우·구조만 참고</div>
+
+<!-- ══ 캔버스 ══ -->
+<div class="canvas-area">
+  <div class="fake-page">
+    <div class="fake-bar">
+      <div class="fdot fdot-r"></div>
+      <div class="fdot fdot-y"></div>
+      <div class="fdot fdot-g"></div>
+      <div class="furl">alphareviewmall.cafe24.com/skin-skin25/?tc_t=1778200924341</div>
+    </div>
+    <div class="fake-nav">
+      <div class="fn-logo"></div>
+      <div class="fn-items">
+        <div class="fn-item"></div><div class="fn-item"></div>
+        <div class="fn-item"></div><div class="fn-item"></div>
+        <div class="fn-item" style="width:48px;"></div>
+      </div>
+      <div class="fn-right">
+        <div class="fn-icon"></div><div class="fn-icon"></div><div class="fn-icon"></div>
+      </div>
+    </div>
+    <div class="fake-hero" id="canvas-hero">
+      <span class="fake-hero-label">콘텐츠 배너</span>
+      <span class="hero-text" id="hero-text">속 편한 하루를 위해</span>
+    </div>
+    <div class="fake-section">
+      <div class="fake-card"></div>
+      <div class="fake-card"></div>
+      <div class="fake-card"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ 패널 ══ -->
+<div class="panel">
+  <div class="panel-header">
+    <span class="panel-title">콘텐츠 배너 설정</span>
+    <span class="saving-chip">수정함</span>
+  </div>
+
+  <div class="slides-vp">
+    <div class="slides" id="slides">
+
+      <!-- ────── Slide 0: 메인 설정 ────── -->
+      <div class="slide" id="slide-main">
+
+        <div class="acc-row"><span class="acc-label">스타일</span><span class="acc-chevron">▾</span></div>
+        <div class="acc-row"><span class="acc-label">텍스트 여백</span><span class="acc-chevron">▾</span></div>
+        <div class="acc-row acc-open" style="background:#FAFAFA;"><span class="acc-label">콘텐츠</span><span class="acc-chevron" style="transform:rotate(180deg);">▾</span></div>
+
+        <div class="item-row">
+          <span class="item-handle">≡</span>
+          <span class="item-tag">#1</span>
+          <div class="item-icons">
+            <span class="iicon">˅</span>
+            <span class="iicon">⊙</span>
+            <span class="iicon">✕</span>
+          </div>
+        </div>
+
+        <!-- PC 이미지 -->
+        <div class="sec">
+          <div class="fld-label">PC 이미지 <span class="req">*필수</span></div>
+          <div class="sub-tabs" id="pc-tabs">
+            <div class="sub-tab active" onclick="switchTab('pc','upload')">직접 업로드</div>
+            <div class="sub-tab" onclick="switchTab('pc','ai')">✦ AI 배너</div>
+          </div>
+          <div id="pc-upload">
+            <div class="upload-row">
+              <input class="url-inp" type="text" placeholder="https://ecimg.cafe24img.com/pg2">
+              <button class="upload-btn">업로드</button>
+            </div>
+            <div class="img-thumb"><span>이미지 없음</span></div>
+          </div>
+          <div id="pc-ai" style="display:none;">
+            <div class="ai-applied" id="pc-applied">
+              <div class="ai-thumb-sm b1" id="pc-thumb"></div>
+              <div class="ai-app-info">
+                <div class="ai-app-label">AI 배너 적용됨</div>
+                <div class="ai-app-sub">변경하려면 버튼을 눌러주세요</div>
+              </div>
+              <button class="ai-change" onclick="openAiSelect('pc')">변경</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- 모바일 이미지 -->
+        <div class="sec">
+          <div class="fld-label">모바일 이미지 <span class="info">i</span></div>
+          <div class="sub-tabs" id="mo-tabs">
+            <div class="sub-tab active" onclick="switchTab('mo','upload')">직접 업로드</div>
+            <div class="sub-tab" onclick="switchTab('mo','ai')">✦ AI 배너</div>
+          </div>
+          <div id="mo-upload">
+            <div class="upload-row">
+              <input class="url-inp" type="text" placeholder="https://ecimg.cafe24img.com/pg2">
+              <button class="upload-btn">업로드</button>
+            </div>
+            <div class="img-thumb"><span>이미지 없음</span></div>
+          </div>
+          <div id="mo-ai" style="display:none;">
+            <div class="ai-applied" id="mo-applied">
+              <div class="ai-thumb-sm b1" id="mo-thumb"></div>
+              <div class="ai-app-info">
+                <div class="ai-app-label">AI 배너 적용됨</div>
+                <div class="ai-app-sub" id="mo-sub">자르기 전</div>
+              </div>
+              <button class="ai-change" onclick="openAiSelect('mo')">변경</button>
+            </div>
+            <div class="crop-badge" id="mo-crop-badge"></div>
+          </div>
+        </div>
+
+        <!-- 소재목 -->
+        <div class="sec">
+          <div class="fld-label">소재목 <span class="info">i</span></div>
+          <input class="sim-inp" type="text" placeholder="소재목">
+        </div>
+
+        <!-- 제목 -->
+        <div class="sec">
+          <div class="fld-label">제목</div>
+          <input class="sim-inp" type="text" value="속 편한 하루를 위해">
+        </div>
+
+        <!-- 설명 -->
+        <div class="sec">
+          <div class="fld-label">설명 <span class="info">i</span></div>
+          <input class="sim-inp" type="text" value="10가지 복합 성분이 숙면을 지원해요.">
+        </div>
+
+        <div class="sec" style="display:flex;justify-content:flex-end;">
+          <button class="del-btn">삭제</button>
+        </div>
+
+      </div><!-- /slide-main -->
+
+
+      <!-- ────── Slide 1: AI 배너 선택 ────── -->
+      <div class="slide" id="slide-ai">
+        <div class="slide-hd">
+          <button class="back-btn" onclick="cancelAiSelect()">‹ 돌아가기</button>
+          <span class="slide-hd-title" id="ai-title">AI 배너 선택</span>
+          <span class="slide-hd-target" id="ai-target-badge">PC</span>
+        </div>
+        <div class="ai-inner">
+          <p class="ai-hint" id="ai-hint">원하는 배너를 선택하세요.</p>
+          <div class="banner-grid" id="ai-grid">
+            <div class="bc b1" onclick="pickCard(this,'b1')"></div>
+            <div class="bc b2" onclick="pickCard(this,'b2')"></div>
+            <div class="bc b3" onclick="pickCard(this,'b3')"></div>
+            <div class="bc b4" onclick="pickCard(this,'b4')"></div>
+          </div>
+          <button class="btn-more">✦ AI 배너 더 생성하기</button>
+
+          <!-- 모바일 전용: 자르기 안내 -->
+          <div class="crop-hint" id="crop-hint">
+            <div class="crop-hint-title">모바일 화면 비율에 맞게 자를 수 있어요</div>
+            <div class="crop-hint-btns">
+              <button class="btn-direct" onclick="applyDirect()">그냥 적용</button>
+              <button class="btn-crop" onclick="openCropModal()">✂ 자르기</button>
+            </div>
+          </div>
+        </div>
+      </div><!-- /slide-ai -->
+
+    </div><!-- /slides -->
+  </div><!-- /slides-vp -->
+
+  <!-- Footer: 메인 -->
+  <div class="panel-footer" id="footer-main">
+    <button class="btn-cancel">취소</button>
+    <button class="btn-save">저장</button>
+  </div>
+  <!-- Footer: AI 선택 -->
+  <div class="panel-footer" id="footer-ai" style="display:none;">
+    <button class="btn-cancel" onclick="cancelAiSelect()">취소</button>
+    <button class="btn-ai-apply" id="btn-apply" onclick="applyBanner()">선택하기</button>
+  </div>
+
+</div><!-- /panel -->
+
+<!-- ══ 크롭 모달 ══ -->
+<div class="modal-bg" id="crop-modal" onclick="handleCropBg(event)">
+  <div class="crop-box-wrap">
+    <div class="crop-modal">
+      <div class="crop-mhd">
+        <div>
+          <div class="crop-title">모바일용 사진 자르기</div>
+          <div class="crop-sub">비율을 선택하거나 영역을 조정하세요</div>
+        </div>
+        <div class="ratio-tabs">
+          <button class="ratio-tab active" onclick="setRatio('4:3',this)">4:3</button>
+          <button class="ratio-tab" onclick="setRatio('3:4',this)">3:4</button>
+          <button class="ratio-tab" onclick="setRatio('16:9',this)">16:9</button>
+        </div>
+      </div>
+      <div class="crop-area">
+        <div class="crop-img b1" id="crop-img"></div>
+        <div class="crop-frame" id="crop-frame">
+          <div class="grid-lines">
+            <div class="gv"></div><div class="gv"></div>
+            <div class="gh"></div><div class="gh"></div>
+          </div>
+          <div class="crn tl"></div><div class="crn tr"></div>
+          <div class="crn bl"></div><div class="crn br"></div>
+        </div>
+      </div>
+      <div class="crop-mft">
+        <span class="crop-mft-left" id="ratio-label">4:3 비율로 자르기</span>
+        <button class="btn-crop-cancel" onclick="closeCropModal()">취소</button>
+        <button class="btn-crop-done" onclick="doneCrop()">자르기 완료</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+const SLIDE_W = 320;
+const CW = 500, CH = 200;
+const RATIOS = { '4:3':{w:213,h:160}, '3:4':{w:120,h:160}, '16:9':{w:284,h:160} };
+const RATIO_LABELS = { '4:3':'4:3 비율로 자르기', '3:4':'3:4 비율로 자르기', '16:9':'16:9 비율로 자르기' };
+const RATIO_KO = { '4:3':'4:3', '3:4':'3:4', '16:9':'16:9' };
+const GRADS = {
+  b1:'linear-gradient(135deg,#a8edea,#fed6e3)',
+  b2:'linear-gradient(135deg,#c3aed6,#f9e4b7)',
+  b3:'linear-gradient(135deg,#89f7fe,#66a6ff)',
+  b4:'linear-gradient(135deg,#fddb92,#d1fdff)',
+};
+
+const s = {
+  slide: 0,
+  target: null,   // 'pc' | 'mo'
+  pcColor: null,  // applied PC color
+  moColor: null,  // applied MO color
+  tmpColor: null, // temp in AI select
+  moCropDone: false,
+  moCropRatio: '4:3',
+  cropRatio: '4:3',
+};
+
+// ── Navigation ──
+function goToSlide(n) {
+  s.slide = n;
+  document.getElementById('slides').style.transform = `translateX(${-n * SLIDE_W}px)`;
+}
+
+function openAiSelect(target) {
+  s.target = target;
+  s.tmpColor = null;
+  const isPC = target === 'pc';
+  document.getElementById('ai-title').textContent = isPC ? 'AI 배너 선택 — PC' : 'AI 배너 선택 — 모바일';
+  document.getElementById('ai-target-badge').textContent = isPC ? 'PC' : '모바일';
+  document.getElementById('ai-hint').textContent = isPC
+    ? '쇼핑몰 메인에 적용할 배너를 선택하세요.'
+    : '모바일 화면에 적용할 배너를 선택하세요.';
+  document.getElementById('crop-hint').classList.remove('show');
+  document.querySelectorAll('.bc').forEach(c => c.classList.remove('selected'));
+  document.getElementById('btn-apply').classList.remove('on');
+  document.getElementById('btn-apply').textContent = '선택하기';
+  goToSlide(1);
+  document.getElementById('footer-main').style.display = 'none';
+  document.getElementById('footer-ai').style.display = 'flex';
+}
+
+function cancelAiSelect() {
+  s.tmpColor = null;
+  goToSlide(0);
+  document.getElementById('footer-main').style.display = 'flex';
+  document.getElementById('footer-ai').style.display = 'none';
+  // If nothing was ever applied, revert tab to upload
+  if (s.target === 'pc' && !s.pcColor) silentTab('pc', 'upload');
+  if (s.target === 'mo' && !s.moColor) silentTab('mo', 'upload');
+}
+
+// ── Tab switching ──
+function switchTab(sec, type) {
+  silentTab(sec, type);
+  if (type === 'ai') {
+    const hasColor = sec === 'pc' ? s.pcColor : s.moColor;
+    if (!hasColor) setTimeout(() => openAiSelect(sec), 60);
+  }
+}
+
+function silentTab(sec, type) {
+  const tabs = document.getElementById(sec + '-tabs').querySelectorAll('.sub-tab');
+  tabs[0].classList.toggle('active', type === 'upload');
+  tabs[1].classList.toggle('active', type === 'ai');
+  const hasColor = sec === 'pc' ? s.pcColor : s.moColor;
+  document.getElementById(sec + '-upload').style.display = type === 'upload' ? 'block' : 'none';
+  document.getElementById(sec + '-ai').style.display = (type === 'ai' && hasColor) ? 'block' : 'none';
+}
+
+// ── Card selection ──
+function pickCard(el, color) {
+  document.querySelectorAll('.bc').forEach(c => c.classList.remove('selected'));
+  el.classList.add('selected');
+  s.tmpColor = color;
+  const btn = document.getElementById('btn-apply');
+  btn.classList.add('on');
+  if (s.target === 'mo') {
+    document.getElementById('crop-hint').classList.add('show');
+    btn.textContent = '이대로 적용';
+  } else {
+    btn.textContent = '선택하기';
+  }
+}
+
+// ── Apply ──
+function applyBanner() {
+  if (!s.tmpColor) return;
+  commitApply(s.target, s.tmpColor, false, null);
+  cancelAiSelect();
+}
+
+function applyDirect() {
+  if (!s.tmpColor) return;
+  commitApply('mo', s.tmpColor, false, null);
+  cancelAiSelect();
+}
+
+function commitApply(target, color, cropDone, cropRatio) {
+  if (target === 'pc') {
+    s.pcColor = color;
+    document.getElementById('pc-thumb').className = 'ai-thumb-sm ' + color;
+    document.getElementById('pc-ai').style.display = 'block';
+    silentTab('pc', 'ai');
+    // Update canvas
+    document.getElementById('canvas-hero').style.background = GRADS[color];
+    document.getElementById('hero-text').style.color = 'rgba(0,0,0,0.35)';
+  } else {
+    s.moColor = color;
+    s.moCropDone = cropDone;
+    if (cropRatio) s.moCropRatio = cropRatio;
+    document.getElementById('mo-thumb').className = 'ai-thumb-sm ' + color;
+    document.getElementById('mo-ai').style.display = 'block';
+    silentTab('mo', 'ai');
+    const sub = document.getElementById('mo-sub');
+    const badge = document.getElementById('mo-crop-badge');
+    if (cropDone) {
+      sub.textContent = s.moCropRatio + ' 비율로 자름';
+      badge.textContent = '✓ ' + s.moCropRatio + ' 비율로 잘렸어요';
+      badge.classList.add('show');
+    } else {
+      sub.textContent = '자르기 전 (원본 적용)';
+      badge.classList.remove('show');
+    }
+  }
+}
+
+// ── Crop modal ──
+function openCropModal() {
+  if (!s.tmpColor) return;
+  document.getElementById('crop-img').className = 'crop-img ' + s.tmpColor;
+  s.cropRatio = '4:3';
+  document.querySelectorAll('.ratio-tab').forEach((t,i) => t.classList.toggle('active', i === 0));
+  document.getElementById('ratio-label').textContent = RATIO_LABELS['4:3'];
+  updateCropFrame();
+  document.getElementById('crop-modal').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+
+function closeCropModal() {
+  document.getElementById('crop-modal').classList.remove('open');
+  document.body.style.overflow = '';
+}
+
+function handleCropBg(e) {
+  if (e.target === document.getElementById('crop-modal')) closeCropModal();
+}
+
+function setRatio(ratio, el) {
+  s.cropRatio = ratio;
+  document.querySelectorAll('.ratio-tab').forEach(t => t.classList.remove('active'));
+  el.classList.add('active');
+  document.getElementById('ratio-label').textContent = RATIO_LABELS[ratio];
+  updateCropFrame();
+}
+
+function updateCropFrame() {
+  const cfg = RATIOS[s.cropRatio];
+  const f = document.getElementById('crop-frame');
+  f.style.width = cfg.w + 'px';
+  f.style.height = cfg.h + 'px';
+  f.style.left = ((CW - cfg.w) / 2) + 'px';
+  f.style.top = ((CH - cfg.h) / 2) + 'px';
+}
+
+function doneCrop() {
+  closeCropModal();
+  commitApply('mo', s.tmpColor, true, s.cropRatio);
+  cancelAiSelect();
+}
+
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape' && document.getElementById('crop-modal').classList.contains('open')) closeCropModal();
+});
+
+updateCropFrame();
+</script>
+
+</body>
+</html>
