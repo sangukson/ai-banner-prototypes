@@ -68,7 +68,7 @@
   /* Mockup container — 확대 버튼 */
   .mockup-container {
     position: relative;
-    margin-bottom: 12px;
+    margin-bottom: 10px;
     cursor: pointer;
   }
   .mockup-container:hover .expand-overlay { opacity: 1; }
@@ -187,7 +187,8 @@
     font-family: 'Pretendard', sans-serif;
     margin-bottom: 6px; transition: background 0.15s;
   }
-  .btn-apply:hover { background: #6D28D9; }
+  .btn-apply:hover:not(:disabled) { background: #6D28D9; }
+  .btn-apply:disabled { background: #C4B5FD; cursor: not-allowed; }
   .btn-more {
     width: 100%; height: 34px;
     background: #fff; color: #7C3AED;
@@ -197,6 +198,31 @@
     transition: background 0.15s;
   }
   .btn-more:hover { background: #F5F2FF; }
+
+  /* 모바일 자르기 버튼 */
+  .btn-crop {
+    width: 100%; height: 34px;
+    background: #fff; color: #374151;
+    font-size: 12px; font-weight: 600;
+    border: 1.5px solid #E5E7EB; border-radius: 8px;
+    cursor: pointer; font-family: 'Pretendard', sans-serif;
+    margin-bottom: 6px; transition: all 0.15s;
+    display: flex; align-items: center; justify-content: center; gap: 5px;
+  }
+  .btn-crop:hover { border-color: #7C3AED; color: #7C3AED; background: #FAFAFF; }
+
+  /* 모바일 hint */
+  .mo-hint {
+    font-size: 11px; color: #9CA3AF; line-height: 1.5;
+    margin-bottom: 10px;
+  }
+  .crop-done-badge {
+    display: none;
+    align-items: center; gap: 4px;
+    font-size: 11px; color: #059669; font-weight: 600;
+    margin-bottom: 8px;
+  }
+  .crop-done-badge.show { display: flex; }
 
   /* Upload */
   .upload-area {
@@ -285,37 +311,126 @@
   .msk-row { display: flex; gap: 8px; margin-top: 4px; }
   .msk-card { flex: 1; height: 52px; background: #E5E7EB; border-radius: 6px; }
 
-  /* 모달 — 모바일 폰 */
-  .modal-phone {
-    width: 200px;
-    border: 3px solid #D1D5DB;
-    border-radius: 32px;
-    overflow: hidden;
-    background: #fff;
-    box-shadow: 0 24px 64px rgba(0,0,0,0.4);
-  }
-  .modal-phone-top {
-    background: #F9FAFB;
-    padding: 10px 0 6px;
-    display: flex; align-items: center; justify-content: center;
-    border-bottom: 1px solid #F3F4F6;
-  }
-  .modal-notch { width: 48px; height: 6px; background: #D1D5DB; border-radius: 3px; }
-  .modal-phone-banner { width: 100%; height: 112px; display: block; }
-  .modal-phone-body {
-    padding: 12px;
-    display: flex; flex-direction: column; gap: 8px;
-    background: #F9FAFB;
-  }
-  .mpsk { height: 8px; background: #E5E7EB; border-radius: 3px; }
-  .mpsk.s { width: 55%; }
-  .mpsk-row { display: flex; gap: 6px; margin-top: 4px; }
-  .mpsk-card { flex: 1; height: 40px; background: #E5E7EB; border-radius: 5px; }
-
   .modal-label {
     color: rgba(255,255,255,0.6);
     font-size: 12px; font-weight: 500;
   }
+
+  /* ── 크롭 모달 ── */
+  .crop-modal {
+    width: 500px;
+    background: #1E2433;
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow: 0 24px 64px rgba(0,0,0,0.5);
+  }
+  .crop-modal-header {
+    padding: 16px 20px;
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 16px;
+  }
+  .crop-title {
+    font-size: 14px; font-weight: 700; color: #fff;
+    margin-bottom: 3px;
+  }
+  .crop-sub {
+    font-size: 11px; color: rgba(255,255,255,0.45);
+  }
+  .ratio-tabs {
+    display: flex; gap: 4px; flex-shrink: 0;
+  }
+  .ratio-tab {
+    padding: 5px 10px;
+    font-size: 12px; font-weight: 600;
+    border: 1.5px solid rgba(255,255,255,0.15);
+    border-radius: 6px;
+    background: transparent;
+    color: rgba(255,255,255,0.45);
+    cursor: pointer;
+    font-family: 'Pretendard', sans-serif;
+    transition: all 0.15s;
+  }
+  .ratio-tab.active {
+    border-color: #7C3AED;
+    color: #fff;
+    background: rgba(124,58,237,0.25);
+  }
+  .ratio-tab:hover:not(.active) {
+    border-color: rgba(255,255,255,0.3);
+    color: rgba(255,255,255,0.7);
+  }
+
+  /* 크롭 이미지 영역 */
+  .crop-area {
+    position: relative;
+    width: 500px;
+    height: 200px;
+    overflow: hidden;
+    cursor: crosshair;
+  }
+  .crop-image {
+    width: 100%; height: 100%; display: block;
+  }
+  .crop-box {
+    position: absolute;
+    border: 1.5px solid #fff;
+    box-shadow: 0 0 0 9999px rgba(0,0,0,0.55);
+    z-index: 2;
+    transition: all 0.22s cubic-bezier(0.4,0,0.2,1);
+    cursor: move;
+  }
+  .grid-lines { position: absolute; inset: 0; }
+  .grid-v, .grid-h { position: absolute; background: rgba(255,255,255,0.22); }
+  .grid-v { width: 1px; top: 0; bottom: 0; }
+  .grid-v:nth-child(1) { left: 33.33%; }
+  .grid-v:nth-child(2) { left: 66.66%; }
+  .grid-h { height: 1px; left: 0; right: 0; }
+  .grid-h:nth-child(3) { top: 33.33%; }
+  .grid-h:nth-child(4) { top: 66.66%; }
+  .corner {
+    position: absolute;
+    width: 12px; height: 12px;
+    border-color: #fff; border-style: solid;
+  }
+  .corner.tl { top: -1px; left: -1px; border-width: 2.5px 0 0 2.5px; }
+  .corner.tr { top: -1px; right: -1px; border-width: 2.5px 2.5px 0 0; }
+  .corner.bl { bottom: -1px; left: -1px; border-width: 0 0 2.5px 2.5px; }
+  .corner.br { bottom: -1px; right: -1px; border-width: 0 2.5px 2.5px 0; }
+
+  .crop-footer {
+    padding: 12px 20px 16px;
+    display: flex; gap: 8px; justify-content: flex-end;
+    align-items: center;
+  }
+  .crop-footer-left {
+    flex: 1;
+    font-size: 11px; color: rgba(255,255,255,0.35);
+  }
+  .crop-cancel {
+    padding: 8px 18px;
+    border-radius: 8px;
+    border: 1.5px solid rgba(255,255,255,0.15);
+    background: transparent;
+    font-size: 13px; font-weight: 500;
+    color: rgba(255,255,255,0.55);
+    cursor: pointer;
+    font-family: 'Pretendard', sans-serif;
+    transition: all 0.15s;
+  }
+  .crop-cancel:hover { background: rgba(255,255,255,0.08); color: rgba(255,255,255,0.8); }
+  .crop-done {
+    padding: 8px 20px;
+    border-radius: 8px; border: none;
+    background: #7C3AED;
+    font-size: 13px; font-weight: 600;
+    color: #fff;
+    cursor: pointer;
+    font-family: 'Pretendard', sans-serif;
+    transition: background 0.15s;
+  }
+  .crop-done:hover { background: #6D28D9; }
 </style>
 </head>
 <body>
@@ -371,10 +486,10 @@
         </div>
 
         <div class="banner-grid" id="pc-grid">
-          <div class="banner-card b1 selected" onclick="selectBanner('pc',this,'b1')"></div>
-          <div class="banner-card b2" onclick="selectBanner('pc',this,'b2')"></div>
-          <div class="banner-card b3" onclick="selectBanner('pc',this,'b3')"></div>
-          <div class="banner-card b4" onclick="selectBanner('pc',this,'b4')"></div>
+          <div class="banner-card b1 selected" onclick="selectBanner(this,'b1')"></div>
+          <div class="banner-card b2" onclick="selectBanner(this,'b2')"></div>
+          <div class="banner-card b3" onclick="selectBanner(this,'b3')"></div>
+          <div class="banner-card b4" onclick="selectBanner(this,'b4')"></div>
         </div>
         <button class="btn-apply">적용하기</button>
         <button class="btn-more">✦ AI 배너 더 생성하기</button>
@@ -399,6 +514,7 @@
       </div>
 
       <div id="mo-ai">
+        <p class="mo-hint">PC에서 선택한 이미지를 모바일 화면에 맞게 잘라주세요</p>
         <div class="mockup-container" onclick="openModal('mo')">
           <div class="phone-wrap">
             <div class="phone">
@@ -419,18 +535,15 @@
             </div>
           </div>
           <div class="expand-overlay">
-            <button class="expand-btn">⛶ 크게 보기</button>
+            <button class="expand-btn">✂ 자르기</button>
           </div>
         </div>
 
-        <div class="banner-grid" id="mo-grid">
-          <div class="banner-card b1 selected" onclick="selectBanner('mo',this,'b1')"></div>
-          <div class="banner-card b2" onclick="selectBanner('mo',this,'b2')"></div>
-          <div class="banner-card b3" onclick="selectBanner('mo',this,'b3')"></div>
-          <div class="banner-card b4" onclick="selectBanner('mo',this,'b4')"></div>
+        <div class="crop-done-badge" id="crop-badge">
+          <span>✓</span> 4:3 비율로 잘렸어요
         </div>
-        <button class="btn-apply">적용하기</button>
-        <button class="btn-more">✦ AI 배너 더 생성하기</button>
+        <button class="btn-crop" onclick="openModal('mo')">✂ 모바일용으로 자르기</button>
+        <button class="btn-apply" id="mo-apply" disabled>적용하기</button>
       </div>
     </div>
 
@@ -447,7 +560,7 @@
   <div class="modal-inner" id="modal-inner">
     <button class="modal-close" onclick="closeModal()">✕</button>
 
-    <!-- PC 모달 -->
+    <!-- PC 모달: 브라우저 목업 미리보기 -->
     <div id="modal-pc" style="display:none;">
       <div class="modal-browser">
         <div class="modal-browser-bar">
@@ -469,22 +582,39 @@
       </div>
     </div>
 
-    <!-- 모바일 모달 -->
+    <!-- 모바일 모달: 크롭 UI -->
     <div id="modal-mo" style="display:none;">
-      <div class="modal-phone">
-        <div class="modal-phone-top"><div class="modal-notch"></div></div>
-        <div id="modal-mo-banner" class="modal-phone-banner b1"></div>
-        <div class="modal-phone-body">
-          <div class="mpsk"></div>
-          <div class="mpsk s"></div>
-          <div class="mpsk-row">
-            <div class="mpsk-card"></div>
-            <div class="mpsk-card"></div>
+      <div class="crop-modal">
+        <div class="crop-modal-header">
+          <div>
+            <div class="crop-title">모바일용 사진 자르기</div>
+            <div class="crop-sub">비율을 선택하거나 영역을 조정하세요</div>
           </div>
-          <div class="mpsk-row">
-            <div class="mpsk-card"></div>
-            <div class="mpsk-card"></div>
+          <div class="ratio-tabs">
+            <button class="ratio-tab active" onclick="setRatio('4:3', this)">4:3</button>
+            <button class="ratio-tab" onclick="setRatio('3:4', this)">3:4</button>
+            <button class="ratio-tab" onclick="setRatio('16:9', this)">16:9</button>
           </div>
+        </div>
+        <div class="crop-area" id="crop-area">
+          <div id="crop-image" class="crop-image b1"></div>
+          <div class="crop-box" id="crop-box">
+            <div class="grid-lines">
+              <div class="grid-v"></div>
+              <div class="grid-v"></div>
+              <div class="grid-h"></div>
+              <div class="grid-h"></div>
+            </div>
+            <div class="corner tl"></div>
+            <div class="corner tr"></div>
+            <div class="corner bl"></div>
+            <div class="corner br"></div>
+          </div>
+        </div>
+        <div class="crop-footer">
+          <span class="crop-footer-left" id="crop-ratio-label">4:3 비율로 자르기</span>
+          <button class="crop-cancel" onclick="closeModal()">취소</button>
+          <button class="crop-done" onclick="doneCrop()">자르기 완료</button>
         </div>
       </div>
     </div>
@@ -494,13 +624,28 @@
 </div>
 
 <script>
-  const gradients = {
-    b1: 'linear-gradient(135deg, #a8edea, #fed6e3)',
-    b2: 'linear-gradient(135deg, #c3aed6, #f9e4b7)',
-    b3: 'linear-gradient(135deg, #89f7fe, #66a6ff)',
-    b4: 'linear-gradient(135deg, #fddb92, #d1fdff)',
+  let currentColor = 'b1';
+  let currentRatio = '4:3';
+  let cropDone = false;
+
+  const CROP_AREA_W = 500;
+  const CROP_AREA_H = 200;
+
+  const ratioConfigs = {
+    '4:3':  { w: 213, h: 160 },
+    '3:4':  { w: 120, h: 160 },
+    '16:9': { w: 284, h: 160 },
   };
-  let currentColor = { pc: 'b1', mo: 'b1' };
+  const ratioLabels = {
+    '4:3': '4:3 비율로 자르기',
+    '3:4': '3:4 비율로 자르기',
+    '16:9': '16:9 비율로 자르기',
+  };
+  const ratioKo = {
+    '4:3': '4:3',
+    '3:4': '3:4',
+    '16:9': '16:9',
+  };
 
   function switchTab(section, type) {
     const tabs = document.getElementById(section + '-tabs').querySelectorAll('.tab');
@@ -510,30 +655,69 @@
     document.getElementById(section + '-ai').style.display = type === 'ai' ? 'block' : 'none';
   }
 
-  function selectBanner(section, el, colorClass) {
-    const grid = document.getElementById(section + '-grid');
-    grid.querySelectorAll('.banner-card').forEach(c => c.classList.remove('selected'));
+  function selectBanner(el, colorClass) {
+    document.getElementById('pc-grid').querySelectorAll('.banner-card').forEach(c => c.classList.remove('selected'));
     el.classList.add('selected');
-    currentColor[section] = colorClass;
+    currentColor = colorClass;
 
-    const preview = document.getElementById(section + '-preview');
-    preview.className = (section === 'pc' ? 'browser-banner' : 'phone-banner') + ' ' + colorClass;
+    document.getElementById('pc-preview').className = 'browser-banner ' + colorClass;
+    document.getElementById('mo-preview').className = 'phone-banner ' + colorClass;
+
+    // PC 이미지 바뀌면 모바일 크롭 리셋
+    if (cropDone) {
+      cropDone = false;
+      document.getElementById('crop-badge').classList.remove('show');
+      document.getElementById('mo-apply').disabled = true;
+    }
   }
 
   function openModal(section) {
-    const color = currentColor[section];
     document.getElementById('modal-pc').style.display = section === 'pc' ? 'block' : 'none';
     document.getElementById('modal-mo').style.display = section === 'mo' ? 'block' : 'none';
+    const label = document.getElementById('modal-label');
 
     if (section === 'pc') {
-      document.getElementById('modal-pc-banner').className = 'modal-browser-banner ' + color;
-      document.getElementById('modal-label').textContent = 'PC 배너 미리보기';
+      document.getElementById('modal-pc-banner').className = 'modal-browser-banner ' + currentColor;
+      label.textContent = 'PC 배너 미리보기';
+      label.style.display = '';
     } else {
-      document.getElementById('modal-mo-banner').className = 'modal-phone-banner ' + color;
-      document.getElementById('modal-label').textContent = '모바일 배너 미리보기';
+      document.getElementById('crop-image').className = 'crop-image ' + currentColor;
+      currentRatio = '4:3';
+      document.querySelectorAll('.ratio-tab').forEach((t, i) => t.classList.toggle('active', i === 0));
+      document.getElementById('crop-ratio-label').textContent = ratioLabels['4:3'];
+      updateCropBox();
+      label.style.display = 'none';
     }
+
     document.getElementById('modal').classList.add('open');
     document.body.style.overflow = 'hidden';
+  }
+
+  function setRatio(ratio, el) {
+    currentRatio = ratio;
+    document.querySelectorAll('.ratio-tab').forEach(t => t.classList.remove('active'));
+    el.classList.add('active');
+    document.getElementById('crop-ratio-label').textContent = ratioLabels[ratio];
+    updateCropBox();
+  }
+
+  function updateCropBox() {
+    const cfg = ratioConfigs[currentRatio];
+    const box = document.getElementById('crop-box');
+    box.style.width = cfg.w + 'px';
+    box.style.height = cfg.h + 'px';
+    box.style.left = ((CROP_AREA_W - cfg.w) / 2) + 'px';
+    box.style.top = ((CROP_AREA_H - cfg.h) / 2) + 'px';
+  }
+
+  function doneCrop() {
+    cropDone = true;
+    closeModal();
+    const badge = document.getElementById('crop-badge');
+    badge.textContent = '';
+    badge.innerHTML = '<span>✓</span> ' + ratioKo[currentRatio] + ' 비율로 잘렸어요';
+    badge.classList.add('show');
+    document.getElementById('mo-apply').disabled = false;
   }
 
   function closeModal() {
@@ -546,6 +730,9 @@
   }
 
   document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
+
+  // 초기 크롭박스 위치 설정
+  updateCropBox();
 </script>
 
 </body>
